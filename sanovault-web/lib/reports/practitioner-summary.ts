@@ -17,7 +17,7 @@ export function validatePractitionerSummary(value: unknown): string {
   return summary;
 }
 
-export async function generatePractitionerSummary(source: string): Promise<string> {
+export async function generatePractitionerSummary(source: string, systemPrompt = practitionerSummaryPrompt): Promise<string> {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('AI service unavailable');
 
@@ -28,7 +28,7 @@ export async function generatePractitionerSummary(source: string): Promise<strin
     body: JSON.stringify({
       model: process.env.GROQ_TEXT_MODEL || 'openai/gpt-oss-120b',
       messages: [
-        { role: 'system', content: practitionerSummaryPrompt },
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: source },
       ],
       temperature: 0.1,

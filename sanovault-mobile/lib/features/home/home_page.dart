@@ -4,7 +4,7 @@ import 'package:sanovault/api/models.dart';
 import 'package:sanovault/features/home/add_person_page.dart';
 import 'package:sanovault/features/home/create_household_page.dart';
 import 'package:sanovault/features/doctor/doctor_page.dart';
-import 'package:sanovault/features/family/person_detail_page.dart';
+import 'package:sanovault/features/family/patient_summary_page.dart';
 import 'package:sanovault/features/tracking/visit_notes_page.dart';
 import 'package:sanovault/features/reports/record_detail_page.dart';
 import 'package:sanovault/features/reports/reports_page.dart';
@@ -291,7 +291,7 @@ class _HomePageState extends State<HomePage> {
           },
           onOpenPerson: () {
             _markLast(person.id);
-            _open(PersonDetailPage(personId: person.id));
+            _open(PatientSummaryPage(patientId: person.id));
           },
         ),
       ],
@@ -329,8 +329,10 @@ class _PersonCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: onOpenPerson,
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            alignment: Alignment.centerLeft,
+            onPressed: onOpenPerson,
             child: Text(
               name,
               style: const TextStyle(

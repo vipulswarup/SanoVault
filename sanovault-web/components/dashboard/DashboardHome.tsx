@@ -243,7 +243,9 @@ export function DashboardHome({
                   key={person.id}
                   className="h-full rounded-2xl border border-sage/60 bg-white p-5 shadow-sm shadow-ink/5"
                 >
-                  <h2 className="text-2xl font-bold text-ink">{name}</h2>
+                  <h2 className="text-2xl font-bold text-ink">
+                    <Link href={`/patients/${person.id}/summary`} prefetch={false} onClick={() => setLastPatientId(person.id)} className="inline-flex min-h-11 items-center gap-2 hover:text-brand-strong" aria-label={`Open ${name}'s patient summary`}>{name}<span aria-hidden className="text-base text-brand-strong">↗</span></Link>
+                  </h2>
                   <p
                     className={`mt-1 min-h-6 text-sm font-medium ${person.id === lastPatientId ? "text-slate" : "invisible"}`}
                   >

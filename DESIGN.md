@@ -29,6 +29,7 @@ On the website, Tailwind neutral, blue/indigo, red/rose/amber and green/emerald 
 
 Mobile tabs, in order: **Home · Reports · Log · Medicines · More**.
 
+- **Home**: tap a patient name to open their patient summary. It shows a saved AI case summary (maximum 200 words), a tag cloud sized by linked report count, and separate three-row scroll areas for treatment history and pathology trends. Profile details remain available through Details.
 - **Home**: one card per person with *Log Symptom* and *Log BP*, recent reports, invites. *Prepare doctor packet* is a quiet text link, not a primary button.
 - **Reports**: the one place to add a report (the "+" in the title bar) and to browse them. The phone share sheet also files reports.
 - **Log**: quick entry for a symptom or note, blood pressure, height and weight, a medicine, or a report.
@@ -62,6 +63,7 @@ Rules:
 
 - Labels are plain and family-friendly: "Symptoms & Notes", "Doctor packet", "Who Can See This".
 - Validation messages state the allowed range (for example blood pressure systolic 50–250 mmHg). High readings are coloured, not diagnosed.
+- Patient case summaries are stored in `patient_case_summaries` and reused across web and mobile. Only clinical evidence changes (including medication start/end boundaries) invalidate the content fingerprint; UI metadata and report-summary cache writes do not. A database lease prevents duplicate concurrent generation. Stale summaries must be labelled, and source sections remain usable if AI is disabled or unavailable.
 - Report details show an AI summary for practitioners of at most 200 words, followed by the original file by default. Every PDF page must be viewable on web and mobile. Summary and file loading fail independently; never substitute raw OCR text for a summary.
 - Medical terms and extracted values are shown as read from the document; the app never silently invents a value.
 

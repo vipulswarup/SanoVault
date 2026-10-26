@@ -45,8 +45,9 @@ List<HealthRecord> sortByDocumentDate(List<HealthRecord> records) {
 }
 
 class ReportsPage extends StatefulWidget {
-  const ReportsPage({super.key, this.patientId});
+  const ReportsPage({super.key, this.patientId, this.tag});
   final String? patientId;
+  final String? tag;
 
   @override
   State<ReportsPage> createState() => _ReportsPageState();
@@ -56,6 +57,7 @@ class _ReportsPageState extends State<ReportsPage>
     with PeopleAware<ReportsPage> {
   List<HealthRecord> _records = const [];
   String? _patientId;
+  late String? _tag = widget.tag;
   String _query = '';
   bool _needsReviewOnly = false;
   String? _error;
@@ -112,7 +114,7 @@ class _ReportsPageState extends State<ReportsPage>
     final generation = ++_loadGeneration;
     final api = SessionScope.of(context).api;
     final patientId = _patientId;
-    final plain = _query.isEmpty && !_needsReviewOnly;
+    final plain = _query.isEmpty && !_needsReviewOnly && _tag == null;
     setState(() {
       _refreshing = true;
       _error = null;
@@ -131,11 +133,11 @@ class _ReportsPageState extends State<ReportsPage>
       final records = await api.healthRecords(
         patientId: patientId,
         keyword: _query,
-        tag: _needsReviewOnly ? 'needs_review' : null,
+        tag: _tag ?? (_needsReviewOnly ? 'needs_review' : null),
       );
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
-        _records = sortByDocumentDate(records);
+        _records = sortByDocumentDate(_needsReviewOnly ? records.where((record) => record.tags.contains('needs_review')).toList() : records);
         _loadedOnce = true;
         _refreshing = false;
       });
@@ -254,6 +256,11 @@ class _ReportsPageState extends State<ReportsPage>
               _load();
             },
           ),
+          if (_tag != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [Expanded(child: Text('Topic: ${_tag!.replaceAll('_', ' ')}', style: const TextStyle(color: SvColors.brandStrong))), CupertinoButton(onPressed: () { setState(() => _tag = null); _load(); }, child: const Text('Clear'))]),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(

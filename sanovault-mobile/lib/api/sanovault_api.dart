@@ -5,6 +5,7 @@ import 'package:sanovault/api/api_client.dart';
 import 'package:sanovault/api/api_config.dart';
 import 'package:sanovault/api/api_exception.dart';
 import 'package:sanovault/api/models.dart';
+import 'package:sanovault/api/patient_overview.dart';
 import 'package:sanovault/session/offline_store.dart';
 
 class SanoVaultApi {
@@ -291,6 +292,27 @@ class SanoVaultApi {
       await _client.put('/api/patients/$id', body) as Map<String, dynamic>,
     );
   }
+
+  Future<PatientOverviewData?> cachedPatientOverview(String id) async {
+    final cached = await _offline?.readJson('patient.overview.$id');
+    return cached is Map ? PatientOverviewData.fromJson(Map<String, dynamic>.from(cached)) : null;
+  }
+
+  Future<PatientOverviewData> patientOverview(String id) async {
+    try {
+      final json = Map<String, dynamic>.from(await _client.get('/api/patients/$id/overview') as Map);
+      await _offline?.writeJson('patient.overview.$id', json);
+      return PatientOverviewData.fromJson(json);
+    } catch (caught) {
+      if (caught is ApiException && [401, 403, 404].contains(caught.statusCode)) {
+        await _offline?.removeJson('patient.overview.$id');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> generatePatientCaseSummary(String id) async =>
+    Map<String, dynamic>.from(await _client.post('/api/patients/$id/overview', null, const Duration(seconds: 60)) as Map);
 
   Future<List<HealthRecord>> healthRecords({
     String? patientId,
