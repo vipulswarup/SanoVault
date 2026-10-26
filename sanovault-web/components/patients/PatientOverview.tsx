@@ -32,17 +32,19 @@ export function PatientOverviewContent({ overview, summaryLoading = false, summa
 
       <section aria-labelledby="topics-heading">
         <h2 id="topics-heading" className="text-lg font-semibold text-ink">Explore health topics</h2>
-        <p className="mt-1 text-xs text-slate">Larger tags have more linked reports. Tap a tag to explore.</p>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {overview.tags.map(({ tag, count, weight }) => (
-            <Link key={tag} href={`/health-records?${new URLSearchParams({ patientId: id, tag })}`} prefetch={false}
-              aria-label={`${tag.replaceAll('_', ' ')}: ${count} ${count === 1 ? 'report' : 'reports'}`}
-              style={{ fontSize: `${14 + Math.round(10 * weight)}px` }}
-              className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 font-medium text-brand-strong hover:bg-brand-tint">
-              <span className="break-words">{tag.replaceAll('_', ' ')}</span><span className="text-xs text-slate">{count}</span>
-            </Link>
-          ))}
-          {overview.tags.length === 0 && <p className="text-sm text-slate">Topics will appear as reports are tagged.</p>}
+        <p className="mt-1 text-xs text-slate">Larger tags have more linked reports. Scroll for more topics.</p>
+        <div tabIndex={0} role="region" aria-label="Health topics, scroll for more tags" className="mt-3 max-h-48 overflow-y-auto overscroll-contain rounded-2xl border border-silver bg-white p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {overview.tags.map(({ tag, count, weight }) => (
+              <Link key={tag} href={`/health-records?${new URLSearchParams({ patientId: id, tag })}`} prefetch={false}
+                aria-label={`${tag.replaceAll('_', ' ')}: ${count} ${count === 1 ? 'report' : 'reports'}`}
+                style={{ fontSize: `${14 + Math.round(10 * weight)}px` }}
+                className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 font-medium text-brand-strong hover:bg-brand-tint">
+                <span className="break-words">{tag.replaceAll('_', ' ')}</span><span className="text-xs text-slate">{count}</span>
+              </Link>
+            ))}
+            {overview.tags.length === 0 && <p className="text-sm text-slate">Topics will appear as reports are tagged.</p>}
+          </div>
         </div>
       </section>
 

@@ -32,6 +32,7 @@ class _PatientSummaryPageState extends State<PatientSummaryPage> {
   bool _cached = false;
   int _generation = 0;
   Timer? _timer;
+  final _topicsController = ScrollController();
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _PatientSummaryPageState extends State<PatientSummaryPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _topicsController.dispose();
     super.dispose();
   }
 
@@ -254,7 +256,7 @@ class _PatientSummaryPageState extends State<PatientSummaryPage> {
                   const SizedBox(height: 24),
                   _heading('Explore health topics', CupertinoIcons.tag),
                   const Text(
-                    'Larger tags have more linked reports. Tap a tag to explore.',
+                    'Larger tags have more linked reports. Scroll for more topics.',
                     style: TextStyle(fontSize: 12, color: SvColors.slate),
                   ),
                   const SizedBox(height: 12),
@@ -263,40 +265,62 @@ class _PatientSummaryPageState extends State<PatientSummaryPage> {
                       'Topics will appear as reports are tagged.',
                       style: TextStyle(fontSize: 14, color: SvColors.slate),
                     ),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: data.tags
-                        .map(
-                          (topic) => ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.sizeOf(context).width - 40,
-                            ),
-                            child: CupertinoButton(
-                              color: SvColors.brandTint,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              borderRadius: BorderRadius.circular(24),
-                              onPressed: () => _open(
-                                ReportsPage(
-                                  patientId: widget.patientId,
-                                  tag: topic.tag,
-                                ),
-                              ),
-                              child: Text(
-                                '${humanizeLabel(topic.tag)} · ${topic.count}',
-                                style: TextStyle(
-                                  color: SvColors.brandStrong,
-                                  fontSize: 14 + 10 * topic.weight,
-                                ),
-                              ),
+                  if (data.tags.isNotEmpty)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: SvColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: SvColors.silver),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 192),
+                        child: CupertinoScrollbar(
+                          controller: _topicsController,
+                          thumbVisibility: true,
+                          child: SingleChildScrollView(
+                            controller: _topicsController,
+                            primary: false,
+                            padding: const EdgeInsets.all(12),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: data.tags
+                                  .map(
+                                    (topic) => ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.sizeOf(context).width -
+                                            64,
+                                      ),
+                                      child: CupertinoButton(
+                                        color: SvColors.brandTint,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        borderRadius: BorderRadius.circular(24),
+                                        onPressed: () => _open(
+                                          ReportsPage(
+                                            patientId: widget.patientId,
+                                            tag: topic.tag,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${humanizeLabel(topic.tag)} · ${topic.count}',
+                                          style: TextStyle(
+                                            color: SvColors.brandStrong,
+                                            fontSize: 14 + 10 * topic.weight,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                             ),
                           ),
-                        )
-                        .toList(),
-                  ),
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: 24),
                   _heading('Treatment timeline', CupertinoIcons.calendar),
                   _table('Date', 'Documented events', data.timeline.length, (
