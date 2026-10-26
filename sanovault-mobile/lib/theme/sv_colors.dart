@@ -1,23 +1,26 @@
 import 'package:flutter/cupertino.dart';
 
-/// Calm clinical teal. Mirrors the CSS tokens in sanovault-web/app/globals.css.
+/// Reference palette. Keep in sync with sanovault-web/app/globals.css.
 abstract final class SvColors {
-  static const brand = Color(0xFF0F766E);
-  static const brandStrong = Color(0xFF115E59);
-  static const brandTint = Color(0xFFE3F2F0);
-  static const ink = Color(0xFF1B2B2A);
-  static const slate = Color(0xFF52645F);
-  static const silver = Color(0xFFD9E2E1);
-  static const groupedBackground = Color(0xFFF5F8F8);
+  static const brand = Color(0xFF1E76F7);
+  static const brandStrong = Color(0xFF165FCF);
+  static const brandTint = Color(0xFFE8F0FF);
+  static const ink = Color(0xFF362F2F);
+  static const slate = Color(0xFF625D66);
+  static const silver = Color(0xFFCDD1D9);
+  static const groupedBackground = Color(0xFFF3F2F3);
   static const surface = Color(0xFFFFFFFF);
+  static const peach = Color(0xFFF4999D);
+  static const highlighterRed = Color(0xFFE44B58);
   static const separator = silver;
-  static const danger = Color(0xFFC62828);
-  static const dangerTint = Color(0xFFFDECEC);
-  static const success = Color(0xFF1B7F4B);
-  static const warning = Color(0xFF7A5200);
-  static const warningTint = Color(0xFFFFF1CC);
+  // Darker red and blue keep small text and white button labels readable.
+  static const danger = Color(0xFFB22B3C);
+  static const dangerTint = Color(0xFFFDEBEE);
+  static const success = brandStrong;
+  static const warning = ink;
+  static const warningTint = peach;
 
-  static const primaryButton = brand;
+  static const primaryButton = brandStrong;
   static const sage = brand;
   static const inviteFill = brandTint;
   static const inviteInk = brandStrong;

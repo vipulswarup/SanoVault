@@ -325,7 +325,7 @@ function AppNavView({
                   prefetch={false}
                   aria-current={active ? "page" : undefined}
                   className={`flex min-h-14 flex-col items-center justify-center px-2 text-sm font-medium ${
-                    active ? "text-brand font-semibold" : "text-slate"
+                    active ? "text-brand-strong font-semibold" : "text-slate"
                   }`}
                 >
                   {link.label}

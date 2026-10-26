@@ -135,7 +135,7 @@ export function BloodPressureWeek({ days, readings, onChanged }: Props) {
                     <input aria-label="Pulse" inputMode="numeric" placeholder="Pulse" value={pulse} onChange={(e) => setPulse(e.target.value.replace(/\D/g, '').slice(0, 3))} className="rounded-lg border border-gray-300 px-2 py-2 text-xl" />
                   </div>
                   <div className="flex gap-3">
-                    <button type="button" disabled={busy} onClick={() => void saveEdit()} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong disabled:opacity-60">Save changes</button>
+                    <button type="button" disabled={busy} onClick={() => void saveEdit()} className="rounded-lg bg-brand-strong px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong disabled:opacity-60">Save changes</button>
                     <button type="button" disabled={busy} onClick={() => setEditingId(null)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Cancel</button>
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export function BloodPressureWeek({ days, readings, onChanged }: Props) {
                     {reading.pulse ? <span className="ml-2 text-base text-gray-600">pulse {reading.pulse}</span> : null}
                   </p>
                   <div className="mt-2 flex gap-4">
-                    <button type="button" onClick={() => startEdit(reading)} className="text-sm font-medium text-brand hover:underline">Edit</button>
+                    <button type="button" onClick={() => startEdit(reading)} className="text-sm font-medium text-brand-strong hover:underline">Edit</button>
                     {reading.vaultOwned ? (
                       <button type="button" onClick={() => void remove(reading.id)} className="text-sm font-medium text-red-700 hover:underline">Delete</button>
                     ) : null}

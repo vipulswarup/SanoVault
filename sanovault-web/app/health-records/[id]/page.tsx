@@ -4,7 +4,8 @@ import { useSession } from '@/lib/auth/client';
 import { useRouter, useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import RecordDataDisplay from '@/app/components/RecordDataDisplay';
+import PractitionerSummary from '@/components/documents/PractitionerSummary';
+import OriginalReportViewer from '@/components/documents/OriginalReportViewer';
 import { HealthRecordCategory } from '@/lib/types/health-record-category.types';
 import AppNav from '@/components/layout/AppNav';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -577,26 +578,12 @@ export default function HealthRecordDetailPage() {
                 )}
               </div>
 
-              {record.documentId && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Document</h3>
-                  <Link
-                    href={`/health-records/${recordId}/document`}
-                    className="inline-flex items-center text-coral hover:text-coral-strong transition-colors cursor-pointer"
-                  >
-                    <span className="mr-2">📄</span>
-                    View Document
-                    <span className="ml-2">→</span>
-                  </Link>
-                </div>
-              )}
+              <PractitionerSummary recordId={record.id} revision={record.updatedAt} />
 
-              {record.data && Object.keys(record.data).length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-3">Record Details</h3>
-                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                    <RecordDataDisplay data={record.data} />
-                  </div>
+              {record.documentId && (
+                <div className="space-y-3">
+                  <Link href={`/health-records/${recordId}/document`} className="inline-flex min-h-11 items-center text-sm font-medium text-brand-strong underline">Open full screen &amp; share</Link>
+                  <OriginalReportViewer documentId={record.documentId} title={record.title || getRecordTypeLabel(record.recordType)} />
                 </div>
               )}
             </div>

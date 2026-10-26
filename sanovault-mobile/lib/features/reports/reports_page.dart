@@ -264,7 +264,7 @@ class _ReportsPageState extends State<ReportsPage>
                     vertical: 6,
                   ),
                   minimumSize: const Size(0, 32),
-                  color: _needsReviewOnly ? SvColors.brand : SvColors.brandTint,
+                  color: _needsReviewOnly ? SvColors.primaryButton : SvColors.brandTint,
                   onPressed: () {
                     setState(() => _needsReviewOnly = !_needsReviewOnly);
                     _load();

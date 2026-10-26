@@ -462,7 +462,7 @@ class _MiniButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = filled ? SvColors.brand : SvColors.surface;
+    final background = filled ? SvColors.primaryButton : SvColors.surface;
     final foreground = filled ? CupertinoColors.white : SvColors.brandStrong;
     return CupertinoButton(
       padding: EdgeInsets.zero,

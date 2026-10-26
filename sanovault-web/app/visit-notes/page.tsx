@@ -235,7 +235,7 @@ function VisitNotesContent() {
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-gray-200 bg-white px-4 py-4">
         <div className="mx-auto flex max-w-lg items-center justify-between">
-          <Link href="/dashboard" className="min-h-11 text-base font-medium text-brand">Home</Link>
+          <Link href="/dashboard" className="min-h-11 text-base font-medium text-brand-strong">Home</Link>
           <p className="text-base font-semibold text-gray-950">Symptoms &amp; Notes</p>
           <Link href={selectedId ? `/for-the-doctor?patientId=${selectedId}` : '/for-the-doctor'} className="min-h-11 text-sm font-medium text-coral">
             For doctor

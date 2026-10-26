@@ -348,6 +348,15 @@ class SanoVaultApi {
     );
   }
 
+  Future<String> reportSummary(String id) async {
+    final result = await _client.post(
+      '/api/health-records/$id/summary',
+      null,
+      const Duration(seconds: 60),
+    ) as Map<String, dynamic>;
+    return result['summary'] as String;
+  }
+
   Future<HealthRecord> createHealthRecord(Map<String, dynamic> body) async {
     return HealthRecord.fromJson(
       await _client.post('/api/health-records', body) as Map<String, dynamic>,

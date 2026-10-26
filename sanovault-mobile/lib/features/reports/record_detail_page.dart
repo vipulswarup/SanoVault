@@ -20,6 +20,9 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
   List<Person> _people = const [];
   String? _error;
   bool _approving = false;
+  String? _summary;
+  String? _summaryError;
+  bool _loadingSummary = true;
 
   @override
   void initState() {
@@ -30,16 +33,36 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
   Future<void> _load() async {
     try {
       final api = SessionScope.of(context).api;
+      final peopleStore = SessionScope.of(context).people;
       final record = await api.healthRecord(widget.recordId);
-      final people = await SessionScope.of(context).people.ensure();
+      final people = await peopleStore.ensure();
       if (!mounted) return;
       setState(() {
         _record = record;
         _people = people;
       });
+      await _loadSummary();
     } catch (caught) {
       if (!mounted) return;
       setState(() => _error = caught.toString());
+    }
+  }
+
+  Future<void> _loadSummary() async {
+    setState(() {
+      _loadingSummary = true;
+      _summaryError = null;
+    });
+    try {
+      final summary = await SessionScope.of(context).api
+          .reportSummary(widget.recordId);
+      if (!mounted) return;
+      setState(() => _summary = summary);
+    } catch (caught) {
+      if (!mounted) return;
+      setState(() => _summaryError = caught.toString());
+    } finally {
+      if (mounted) setState(() => _loadingSummary = false);
     }
   }
 
@@ -48,10 +71,8 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
     if (record == null) return;
     setState(() => _approving = true);
     try {
-      final updated = await SessionScope.of(context).api.updateHealthRecord(
-        record.id,
-        {'approveReview': true},
-      );
+      final updated = await SessionScope.of(context).api
+          .updateHealthRecord(record.id, {'approveReview': true});
       if (!mounted) return;
       setState(() {
         _record = updated;
@@ -83,7 +104,10 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
       title: record == null ? 'Report' : record.displayTitle,
       error: _error,
       child: record == null
-          ? const Padding(padding: EdgeInsets.only(top: 48), child: Center(child: CupertinoActivityIndicator()))
+          ? const Padding(
+              padding: EdgeInsets.only(top: 48),
+              child: Center(child: CupertinoActivityIndicator()),
+            )
           : Column(
               children: [
                 if (needsReview)
@@ -99,12 +123,20 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Needs review', style: TextStyle(fontWeight: FontWeight.w600)),
+                          const Text(
+                            'Needs review',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
                           const SizedBox(height: 4),
-                          Text('Filed for ${_personName(record.patientId)} via WhatsApp.'),
+                          Text(
+                            'Filed for ${_personName(record.patientId)} via WhatsApp.',
+                          ),
                           const SizedBox(height: 10),
                           CupertinoButton.filled(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             onPressed: _approving ? null : _approveReview,
                             child: _approving
                                 ? const CupertinoActivityIndicator()
@@ -126,29 +158,100 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                     ),
                     CupertinoListTile(
                       title: const Text('Date'),
-                      additionalInfo: _trailingInfo(formatDisplayDate(record.documentDate ?? record.createdAt)),
+                      additionalInfo: _trailingInfo(
+                        formatDisplayDate(
+                          record.documentDate ?? record.createdAt,
+                        ),
+                      ),
                     ),
                     if (record.tags.isNotEmpty)
                       CupertinoListTile(
                         title: const Text('Tags'),
-                        subtitle: Text(record.tags.join(', '), maxLines: 3, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(
+                          record.tags.join(', '),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     if (record.documentId != null)
                       CupertinoListTile(
-                        title: const Text('Open file'),
+                        title: const Text('Open full screen'),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () => Navigator.of(context).push(
                           CupertinoPageRoute<void>(
-                            builder: (_) => DocumentViewPage(documentId: record.documentId!, title: record.displayTitle),
+                            builder: (_) => DocumentViewPage(
+                              documentId: record.documentId!,
+                              title: record.displayTitle,
+                            ),
                           ),
                         ),
                       ),
-                    if (record.ocrText != null && record.ocrText!.isNotEmpty)
-                      CupertinoListTile(
-                        title: const Text('Extracted text'),
-                        subtitle: Text(record.ocrText!, maxLines: 8, overflow: TextOverflow.ellipsis),
-                      ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: SvColors.brandTint,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: SvColors.silver),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'AI summary for practitioners',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 10),
+                            if (_loadingSummary)
+                              const CupertinoActivityIndicator()
+                            else if (_summaryError != null) ...[
+                              Text(_summaryError!),
+                              CupertinoButton(
+                                onPressed: _loadSummary,
+                                child: const Text('Retry summary'),
+                              ),
+                            ] else
+                              Text(
+                                _summary ?? '',
+                                style: const TextStyle(height: 1.5),
+                              ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'AI generated · Verify against the original report.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: SvColors.slate,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (record.documentId != null) ...[
+                        const SizedBox(height: 24),
+                        const Text(
+                          'Original report',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: MediaQuery.sizeOf(context).height * 0.7,
+                          child: DocumentViewPage(
+                            key: ValueKey(record.documentId),
+                            documentId: record.documentId!,
+                            title: record.displayTitle,
+                            embedded: true,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),

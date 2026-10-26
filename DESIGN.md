@@ -4,23 +4,26 @@ Decisions shared by the website and the mobile app. If a screen disagrees with t
 
 Tokens live in code: web in `sanovault-web/app/globals.css`, mobile in `sanovault-mobile/lib/theme/sv_colors.dart`. Keep the two in sync.
 
-## Palette: calm clinical teal
+## Palette: clouded blue, peach and soft greys
+
+Based on the shared reference. Use the six reference swatches for the visual identity and darker derived shades where small text needs more contrast.
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| brand | `#0F766E` | Primary buttons, links, selected tab, focus ring |
-| brand-strong | `#115E59` | Pressed/hover state, text on tinted surfaces |
-| brand-tint | `#E3F2F0` | Selected rows, chips, secondary button fill, hover |
-| ink | `#1B2B2A` | Body text |
-| slate | `#52645F` | Secondary text, inactive icons |
-| silver | `#D9E2E1` | Dividers and borders |
-| background | `#F5F8F8` | Page background (cool off-white, never cream) |
+| brand | `#1E76F7` | Clouded Blue: accents, charts, focus rings |
+| brand-strong / primaryButton | `#165FCF` | Primary buttons, links, selected tabs; accessible white labels |
+| brand-tint | `#E8F0FF` | Selected rows, chips, secondary button fill |
+| ink | `#362F2F` | Night Rider: body text |
+| slate | `#625D66` | Secondary text, inactive icons |
+| silver | `#CDD1D9` | Naturally Calm: dividers and borders |
+| background | `#F3F2F3` | Aragonite White: page background |
 | surface | `#FFFFFF` | Cards, sheets, bars |
-| danger | `#C62828` | Errors, destructive actions, readings flagged high |
-| warning / warning-tint | `#7A5200` / `#FFF1CC` | "Needs review" badges |
-| success | `#1B7F4B` | Saved confirmations |
+| peach / warning-tint | `#F4999D` | Peach Burst: review badges and highlights, with dark text |
+| highlighter-red | `#E44B58` | Highlighter Red: chart highlights and status accents |
+| danger / danger-tint | `#B22B3C` / `#FDEBEE` | Readable error text, destructive actions, readings flagged high |
+| success | `#165FCF` | Saved confirmations, with explicit success labels or icons |
 
-On the website, the Tailwind `gray`, `slate`, `blue` and `indigo` scales are remapped to this palette in `globals.css`, so existing utility classes follow the brand. Prefer the named tokens (`bg-brand`, `text-ink`) in new code, and do not introduce new hard-coded hex colours.
+On the website, Tailwind neutral, blue/indigo, red/rose/amber and green/emerald utility scales follow this palette in `globals.css`. Semantic statuses retain their labels and icons. HeroUI uses the same surface, accent and status tokens. Prefer named tokens in new code, and do not introduce new hard-coded colours. Native mobile themes and web browser chrome use the same palette.
 
 ## Navigation
 
@@ -59,11 +62,12 @@ Rules:
 
 - Labels are plain and family-friendly: "Symptoms & Notes", "Doctor packet", "Who Can See This".
 - Validation messages state the allowed range (for example blood pressure systolic 50–250 mmHg). High readings are coloured, not diagnosed.
+- Report details show an AI summary for practitioners of at most 200 words, followed by the original file by default. Every PDF page must be viewable on web and mobile. Summary and file loading fail independently; never substitute raw OCR text for a summary.
 - Medical terms and extracted values are shown as read from the document; the app never silently invents a value.
 
 ## Accessibility
 
-- Text and controls meet WCAG AA contrast with the palette above (white on brand is about 5.4:1).
+- Text and controls meet WCAG AA contrast with the palette above (white on the primary action blue (`#165FCF`) exceeds 4.5:1).
 - Interactive targets are at least 44 pt tall.
 - Selection is shown by more than colour (a check mark or label).
 - Known gaps (tracked in the mobile PLAN): few explicit screen-reader labels, and large-text layouts have not been audited.
