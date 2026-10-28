@@ -127,3 +127,6 @@ grok-image-*.jpg
 
 .DS_Store
 **/.DS_Store
+
+# Locally prepared store archives and installers
+/release-artifacts/

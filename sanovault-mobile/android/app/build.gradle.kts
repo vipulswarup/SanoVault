@@ -47,8 +47,9 @@ android {
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else {
-                // Local release testing only. Play Store uploads require android/key.properties.
-                signingConfigs.getByName("debug")
+                // Never mistake a debug-signed bundle for a store release.
+                // Store uploads require android/key.properties and the existing upload key.
+                null
             }
             isMinifyEnabled = true
             isShrinkResources = true

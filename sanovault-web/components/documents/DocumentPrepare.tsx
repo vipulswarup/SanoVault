@@ -29,7 +29,8 @@ export function DocumentPrepare({
 }) {
   const [sources, setSources] = useState<PreparedSource[] | null>(null);
   const [pages, setPages] = useState<PreparedPage[]>([]);
-  const [combine, setCombine] = useState(files.length > 1);
+  const allImages = files.length > 1 && files.every((file) => file.type.startsWith('image/'));
+  const [combine, setCombine] = useState(allImages);
   const [compress, setCompress] = useState(files.some((file) => file.size > 8 * 1024 * 1024));
   const [keepDroppedAsNext, setKeepDroppedAsNext] = useState(false);
   const [password, setPassword] = useState('');
@@ -161,7 +162,10 @@ export function DocumentPrepare({
     <div className="space-y-5">
       <div>
         <h3 className="text-lg font-semibold text-gray-900">Prepare the document</h3>
-        <p className="mt-1 text-sm text-gray-600">Rotate pages, drop extras, then continue. Photos are combined into one PDF before upload.</p>
+        <p className="mt-1 text-sm text-gray-600">
+          Rotate pages, drop extras, then continue. Each file becomes its own record unless you combine them.
+          All-photo selections start combined into one PDF.
+        </p>
       </div>
 
       {busy ? <p className="text-sm text-gray-600" role="status">{busy}</p> : null}

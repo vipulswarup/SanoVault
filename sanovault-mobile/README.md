@@ -10,7 +10,9 @@ Home with one card per person; Reports (sorted by document date); a Log tab for 
 
 ## Version
 
-Current store release in `pubspec.yaml`: **0.0.3+201** (version name `0.0.3`, build number `201`). This sets iOS/macOS bundle version and Android version name/code through Flutter's build configuration.
+Prepared store release in `pubspec.yaml`: **0.0.4+202** (version name `0.0.4`, build number `202`). This sets iOS/macOS bundle version and Android version name/code through Flutter's build configuration.
+
+Release notes and packaging status: [0.0.4 / build 202](./releases/0.0.4+202.md).
 
 ## Run (debug)
 
@@ -49,6 +51,16 @@ ios/ShareExtension/   iOS share-sheet extension
 
 ## Store release builds
 
+Refresh dependencies once, then apply the existing Apple PDF compatibility patches before native builds:
+
+```bash
+flutter pub get
+dart run tool/remove_darwin_pdfium.dart
+dart run tool/patch_pdfrx_coregraphics_sdk.dart
+```
+
+Build platforms sequentially and preserve completed artifacts outside `build/` before starting the next platform.
+
 ### Android (Play Store AAB)
 
 1. Create an upload keystore (once):
@@ -59,7 +71,7 @@ keytool -genkey -v -keystore android/upload-keystore.jks -keyalg RSA -keysize 20
 
 2. Copy `android/key.properties.example` to `android/key.properties` and fill in passwords / paths. Do not commit `key.properties` or `*.jks`.
 
-3. Build:
+3. Build (without this signing configuration, the release bundle is unsigned and cannot be submitted to Google Play):
 
 ```bash
 flutter build appbundle --release
@@ -73,7 +85,7 @@ flutter build appbundle --release
 3. Archive / IPA:
 
 ```bash
-flutter build ipa --release
+flutter build ipa --release --no-pub --export-options-plist=ios/ExportOptions-AppStore.plist
 # output under build/ios/ipa/
 ```
 
@@ -82,7 +94,7 @@ Or open `ios/Runner.xcworkspace` in Xcode → Product → Archive → Distribute
 ### macOS (Mac App Store)
 
 ```bash
-flutter build macos --release
+flutter build macos --release --no-pub
 # app: build/macos/Build/Products/Release/SanoVault.app
 ```
 

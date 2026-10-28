@@ -55,7 +55,11 @@ export default function PractitionerSummary({ recordId, revision }: { recordId: 
         ) : null}
       </div>
       <div aria-live="polite" className="mt-3 text-sm leading-7 text-ink">
-        {loading ? <p role="status">Preparing summary…</p> : error ? (
+        {loading ? (
+          <p role="status">
+            Preparing summary… This can take a short while after a new upload. The page will update automatically when ready.
+          </p>
+        ) : error ? (
           <div>
             <p role="alert">{error}</p>
             <button type="button" onClick={() => setAttempt((value) => value + 1)} className="mt-2 min-h-11 font-medium text-brand-strong underline">Retry summary</button>

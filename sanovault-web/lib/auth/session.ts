@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth/server';
+import { getUserFromApiToken } from '@/lib/auth/api-token';
 import { getUserFromMobileToken, parseBearerToken } from '@/lib/auth/mobile-session';
 import { sql } from '@/lib/db/neon';
 import { BETA_ACKNOWLEDGEMENT_VERSION } from '@/lib/legal/beta-acknowledgement';
@@ -34,6 +35,16 @@ async function resolveAuthenticatedUser(): Promise<CurrentUser | null> {
   const headerList = await headers();
   const bearer = parseBearerToken(headerList.get('authorization'));
   if (bearer) {
+    if (bearer.startsWith('sv_')) {
+      const apiUser = await getUserFromApiToken(bearer);
+      if (!apiUser) return null;
+      return {
+        id: apiUser.id,
+        email: apiUser.email,
+        name: apiUser.name,
+        acknowledged: apiUser.acknowledged,
+      };
+    }
     return getUserFromMobileToken(bearer);
   }
 

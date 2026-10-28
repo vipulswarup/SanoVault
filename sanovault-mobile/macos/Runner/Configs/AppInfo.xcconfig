@@ -6,6 +6,8 @@
 
 // The application's name. By default this is also the title of the Flutter window.
 PRODUCT_NAME = SanoVault
+MARKETING_VERSION = $(FLUTTER_BUILD_NAME)
+CURRENT_PROJECT_VERSION = $(FLUTTER_BUILD_NUMBER)
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.sanovault.app

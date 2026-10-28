@@ -4,29 +4,38 @@ import { Button } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "@/lib/auth/client";
 import { useHouseholdContext } from "@/components/households/useHouseholdContext";
 import { useToast } from "@/components/ui/ToastProvider";
 
+type NavLink = { href: string; label: string };
+
 type AppNavProps = {
-  links?: Array<{ href: string; label: string }>;
+  links?: NavLink[];
   userLabel?: string;
 };
 
-const defaultLinks = [
+const primaryLinks: NavLink[] = [
   { href: "/dashboard", label: "Home" },
   { href: "/health-records", label: "Reports" },
-  { href: "/visit-notes", label: "Symptoms & Notes" },
-  { href: "/bp", label: "Blood Pressure" },
+  { href: "/visit-notes", label: "Symptoms" },
+  { href: "/bp", label: "BP" },
   { href: "/medications", label: "Medicines" },
   { href: "/patients", label: "Family" },
   { href: "/for-the-doctor", label: "Doctor packet" },
+];
+
+const moreLinks: NavLink[] = [
+  { href: "/care-shares", label: "Share with a doctor" },
   { href: "/households", label: "Who Can See This" },
   { href: "/privacy", label: "Privacy" },
   { href: "/settings/ai", label: "AI processing settings" },
+  { href: "/settings/developer", label: "API access" },
   { href: "/delete-account", label: "Delete account" },
 ];
+
+const defaultLinks = [...primaryLinks, ...moreLinks];
 
 const bottomLinks = [
   { href: "/dashboard", label: "Home", match: "/dashboard" },
@@ -48,7 +57,7 @@ export default function AppNav({
 function AppNavFromSession({
   links,
 }: {
-  links: Array<{ href: string; label: string }>;
+  links: NavLink[];
 }) {
   const { data: session } = useSession();
   return (
@@ -59,11 +68,22 @@ function AppNavFromSession({
   );
 }
 
+function splitLinks(links: NavLink[]) {
+  if (links !== defaultLinks && links.length) {
+    const moreHrefs = new Set(moreLinks.map((link) => link.href));
+    return {
+      primary: links.filter((link) => !moreHrefs.has(link.href)),
+      more: links.filter((link) => moreHrefs.has(link.href)),
+    };
+  }
+  return { primary: primaryLinks, more: moreLinks };
+}
+
 function AppNavView({
   links,
   userLabel,
 }: {
-  links: Array<{ href: string; label: string }>;
+  links: NavLink[];
   userLabel: string;
 }) {
   const { notify } = useToast();
@@ -71,9 +91,30 @@ function AppNavView({
   const router = useRouter();
   const { householdId, households, loading, setActive } = useHouseholdContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const { primary, more } = splitLinks(links);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
+
+  const moreActive = more.some((link) => isActive(link.href));
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   const onSwitch = async (value: string) => {
     setMobileMenuOpen(false);
@@ -106,12 +147,12 @@ function AppNavView({
         aria-label="Primary navigation"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between gap-4">
-            <div className="flex items-center space-x-3 min-w-0">
+          <div className="flex h-16 items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
               <Link
                 href="/dashboard"
                 prefetch={false}
-                className="flex items-center space-x-3 shrink-0"
+                className="flex shrink-0 items-center space-x-3"
               >
                 <Image
                   src="/logo.png"
@@ -122,8 +163,8 @@ function AppNavView({
                 />
                 <span className="text-xl font-bold text-ink">SanoVault</span>
               </Link>
-              <div className="hidden lg:flex items-center space-x-1 ml-4">
-                {links.map((link) => {
+              <div className="hidden min-w-0 items-center gap-0.5 xl:flex">
+                {primary.map((link) => {
                   const active = isActive(link.href);
                   return (
                     <Link
@@ -131,9 +172,9 @@ function AppNavView({
                       href={link.href}
                       prefetch={false}
                       aria-current={active ? "page" : undefined}
-                      className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      className={`whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium ${
                         active
-                          ? "text-ink bg-sage/25"
+                          ? "bg-sage/25 text-ink"
                           : "text-slate hover:text-ink"
                       }`}
                     >
@@ -141,14 +182,58 @@ function AppNavView({
                     </Link>
                   );
                 })}
+                {more.length > 0 ? (
+                  <div className="relative" ref={moreRef}>
+                    <button
+                      type="button"
+                      className={`whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-medium ${
+                        moreActive || moreOpen
+                          ? "bg-sage/25 text-ink"
+                          : "text-slate hover:text-ink"
+                      }`}
+                      aria-expanded={moreOpen}
+                      aria-haspopup="menu"
+                      onClick={() => setMoreOpen((open) => !open)}
+                    >
+                      More
+                    </button>
+                    {moreOpen ? (
+                      <div
+                        role="menu"
+                        className="absolute left-0 z-40 mt-1 min-w-[14rem] rounded-xl border border-silver bg-white py-1 shadow-lg"
+                      >
+                        {more.map((link) => {
+                          const active = isActive(link.href);
+                          return (
+                            <Link
+                              key={link.href}
+                              role="menuitem"
+                              href={link.href}
+                              prefetch={false}
+                              aria-current={active ? "page" : undefined}
+                              onClick={() => setMoreOpen(false)}
+                              className={`block whitespace-nowrap px-4 py-2.5 text-sm ${
+                                active
+                                  ? "bg-sage/20 font-medium text-ink"
+                                  : "text-slate hover:bg-cream hover:text-ink"
+                              }`}
+                            >
+                              {link.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             </div>
-            <div className="hidden lg:flex items-center space-x-3 min-w-0">
+            <div className="hidden shrink-0 items-center gap-3 xl:flex">
               {households.length === 0 && !loading ? (
                 <Link
                   href="/households"
                   prefetch={false}
-                  className="rounded-lg border border-sage px-3 py-2 text-sm font-medium text-ink hover:bg-sage/15"
+                  className="whitespace-nowrap rounded-lg border border-sage px-3 py-2 text-sm font-medium text-ink hover:bg-sage/15"
                 >
                   Who Can See This
                 </Link>
@@ -159,7 +244,7 @@ function AppNavView({
                   </label>
                   <select
                     id="household-switcher"
-                    className="text-sm border border-silver rounded-md px-2 py-1.5 max-w-[10rem] sm:max-w-[14rem] bg-white text-ink"
+                    className="max-w-[12rem] rounded-md border border-silver bg-white px-2 py-1.5 text-sm text-ink"
                     disabled={loading}
                     value={householdId || ""}
                     onChange={(e) => void onSwitch(e.target.value)}
@@ -173,9 +258,6 @@ function AppNavView({
                   </select>
                 </>
               )}
-              <span className="text-sm text-slate truncate hidden sm:inline max-w-[10rem]">
-                {userLabel}
-              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -186,7 +268,7 @@ function AppNavView({
             </div>
             <button
               type="button"
-              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-silver text-ink transition-colors hover:bg-cream focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 lg:hidden"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-silver text-ink transition-colors hover:bg-cream focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 xl:hidden"
               aria-controls="mobile-navigation"
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? "Close more menu" : "Open more menu"}
@@ -230,7 +312,7 @@ function AppNavView({
         {mobileMenuOpen && (
           <div
             id="mobile-navigation"
-            className="border-t border-silver bg-white lg:hidden"
+            className="border-t border-silver bg-white xl:hidden"
           >
             <div className="mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:grid-cols-2 sm:px-6 lg:px-8">
               <div className="space-y-1">
@@ -311,7 +393,7 @@ function AppNavView({
       </nav>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-silver bg-white pb-[env(safe-area-inset-bottom)] print:hidden lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-silver bg-white pb-[env(safe-area-inset-bottom)] print:hidden xl:hidden"
         aria-label="Main actions"
       >
         <ul className="mx-auto grid max-w-lg grid-cols-4">
@@ -335,7 +417,7 @@ function AppNavView({
           })}
         </ul>
       </nav>
-      <div className="h-16 lg:hidden print:hidden" aria-hidden="true" />
+      <div className="h-16 print:hidden xl:hidden" aria-hidden="true" />
     </>
   );
 }

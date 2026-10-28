@@ -4,7 +4,7 @@ import { BETA_ACKNOWLEDGEMENT_VERSION } from '@/lib/legal/beta-acknowledgement';
 
 type MobileUser = { id: string; email: string; name: string; acknowledged?: boolean };
 
-const MOBILE_SESSION_TTL_DAYS = 180;
+const MOBILE_SESSION_TTL_DAYS = 90;
 
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex');

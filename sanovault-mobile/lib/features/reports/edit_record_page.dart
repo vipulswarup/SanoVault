@@ -342,103 +342,106 @@ class _EditRecordPageState extends State<EditRecordPage> {
               padding: EdgeInsets.only(top: 48),
               child: Center(child: CupertinoActivityIndicator()),
             )
-          : ListView(
+          : Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              children: [
-                if (_suggestionLabel != null) ...[
-                  SvCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '"$_suggestionLabel" was not added globally. Closest match: ${_suggestionName ?? 'Other'}.',
-                        ),
-                        const SizedBox(height: 12),
-                        SvFilledButton(
-                          label: 'Use ${_suggestionName ?? 'suggestion'}',
-                          onPressed: _saving ? null : _acceptSuggestion,
-                          enabled: !_saving,
-                        ),
-                        const SizedBox(height: 8),
-                        CupertinoButton(
-                          onPressed: _saving ? null : _keepCustom,
-                          child: const Text('Keep custom on this record'),
-                        ),
-                      ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (_suggestionLabel != null) ...[
+                    SvCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '"$_suggestionLabel" was not added globally. Closest match: ${_suggestionName ?? 'Other'}.',
+                          ),
+                          const SizedBox(height: 12),
+                          SvFilledButton(
+                            label: 'Use ${_suggestionName ?? 'suggestion'}',
+                            onPressed: _saving ? null : _acceptSuggestion,
+                            enabled: !_saving,
+                          ),
+                          const SizedBox(height: 8),
+                          CupertinoButton(
+                            onPressed: _saving ? null : _keepCustom,
+                            child: const Text('Keep custom on this record'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  const Text('Title'),
+                  const SizedBox(height: 6),
+                  CupertinoTextField(controller: _title),
+                  const SizedBox(height: 16),
+                  const Text('Patient'),
+                  const SizedBox(height: 6),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _pickPatient,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(_patientLabel),
                     ),
                   ),
+                  if (_patientId == widget.record.patientId) ...[
+                    const SizedBox(height: 8),
+                    CupertinoTextField(
+                      controller: _firstName,
+                      placeholder: 'First name',
+                    ),
+                    const SizedBox(height: 8),
+                    CupertinoTextField(
+                      controller: _lastName,
+                      placeholder: 'Last name',
+                    ),
+                  ],
                   const SizedBox(height: 16),
-                ],
-                const Text('Title'),
-                const SizedBox(height: 6),
-                CupertinoTextField(controller: _title),
-                const SizedBox(height: 16),
-                const Text('Patient'),
-                const SizedBox(height: 6),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _pickPatient,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(_patientLabel),
+                  const Text('Record type'),
+                  const SizedBox(height: 6),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _pickType,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(_typeLabel),
+                    ),
                   ),
-                ),
-                if (_patientId == widget.record.patientId) ...[
-                  const SizedBox(height: 8),
-                  CupertinoTextField(
-                    controller: _firstName,
-                    placeholder: 'First name',
+                  if (_recordType == 'OTHER') ...[
+                    const SizedBox(height: 8),
+                    CupertinoTextField(
+                      controller: _customType,
+                      placeholder: 'Custom type (optional)',
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  const Text('Hospital or clinic'),
+                  const SizedBox(height: 6),
+                  CupertinoTextField(controller: _source),
+                  const SizedBox(height: 16),
+                  const Text('Doctor'),
+                  const SizedBox(height: 6),
+                  CupertinoTextField(controller: _doctor),
+                  const SizedBox(height: 16),
+                  const Text('Document date'),
+                  const SizedBox(height: 6),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _pickDate,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(formatDisplayDate(formatIsoDate(_documentDate))),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  CupertinoTextField(
-                    controller: _lastName,
-                    placeholder: 'Last name',
-                  ),
-                ],
-                const SizedBox(height: 16),
-                const Text('Record type'),
-                const SizedBox(height: 6),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _pickType,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(_typeLabel),
-                  ),
-                ),
-                if (_recordType == 'OTHER') ...[
-                  const SizedBox(height: 8),
-                  CupertinoTextField(
-                    controller: _customType,
-                    placeholder: 'Custom type (optional)',
+                  const SizedBox(height: 24),
+                  SvFilledButton(
+                    label: _saving ? 'Saving…' : 'Save',
+                    onPressed: _saving ? null : _save,
+                    enabled: !_saving,
                   ),
                 ],
-                const SizedBox(height: 16),
-                const Text('Hospital or clinic'),
-                const SizedBox(height: 6),
-                CupertinoTextField(controller: _source),
-                const SizedBox(height: 16),
-                const Text('Doctor'),
-                const SizedBox(height: 6),
-                CupertinoTextField(controller: _doctor),
-                const SizedBox(height: 16),
-                const Text('Document date'),
-                const SizedBox(height: 6),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _pickDate,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(formatDisplayDate(formatIsoDate(_documentDate))),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                SvFilledButton(
-                  label: _saving ? 'Saving…' : 'Save',
-                  onPressed: _saving ? null : _save,
-                  enabled: !_saving,
-                ),
-              ],
+              ),
             ),
     );
   }

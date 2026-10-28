@@ -18,6 +18,7 @@ export interface AnalysisResult {
     idType: string | null;
     expiryDate: string | null;
     testType: string | null;
+    testTypes: string[];
     bodyPart: string | null;
     tags: string[];
 }
@@ -60,6 +61,7 @@ async function callGroq(prompt: string, systemPrompt: string): Promise<string> {
 }
 
 import { getRecordTypeOptions } from '../constants/labels';
+import { parseDocumentDate } from '@/lib/dates/parse-document-date';
 import {
     getAllCategories,
     getValidCategoryDisplayNames,
@@ -98,15 +100,23 @@ export async function analyzeDocument(text: string): Promise<AnalysisResult> {
             const text = typeof value === 'string' ? value.trim() : '';
             return text || null;
         };
+        const testTypes = Array.isArray(result.testTypes)
+            ? result.testTypes
+                .map((item: unknown) => String(item || '').trim())
+                .filter(Boolean)
+                .slice(0, 5)
+            : [];
+        const primaryTest = textField(result.testType) || testTypes[0] || null;
         return {
             classification,
             confidence: typeof result.confidence === 'number' ? result.confidence : 0,
             source: result.source || null,
             doctorName: isIdDocument ? null : (result.doctorName || null),
-            documentDate: result.documentDate || null,
+            documentDate: parseDocumentDate(result.documentDate),
             idType: isIdDocument ? (result.idType || null) : null,
-            expiryDate: isIdDocument ? (result.expiryDate || null) : null,
-            testType: isIdDocument ? null : textField(result.testType),
+            expiryDate: isIdDocument ? parseDocumentDate(result.expiryDate) : null,
+            testType: isIdDocument ? null : primaryTest,
+            testTypes: isIdDocument ? [] : testTypes,
             bodyPart: isIdDocument ? null : textField(result.bodyPart),
             tags: normalizedTags
         };
@@ -120,6 +130,7 @@ export async function analyzeDocument(text: string): Promise<AnalysisResult> {
             idType: null,
             expiryDate: null,
             testType: null,
+            testTypes: [],
             bodyPart: null,
             tags: []
         };

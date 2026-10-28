@@ -7,6 +7,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sanovault/api/models.dart';
+import 'package:sanovault/features/doctor/care_shares_page.dart';
 import 'package:sanovault/features/doctor/doctor_page.dart';
 import 'package:sanovault/features/folder_check/folder_check_page.dart';
 import 'package:sanovault/features/households/households_page.dart';
@@ -200,6 +201,11 @@ class _MorePageState extends State<MorePage> {
                     title: const Text('Doctor packet'),
                     trailing: const CupertinoListTileChevron(),
                     onTap: () => _open(const DoctorPage()),
+                  ),
+                  CupertinoListTile(
+                    title: const Text('Share with a doctor'),
+                    trailing: const CupertinoListTileChevron(),
+                    onTap: () => _open(const CareSharesPage()),
                   ),
                   CupertinoListTile(
                     title: const Text('Who Can See This'),

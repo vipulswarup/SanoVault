@@ -263,14 +263,22 @@ export default function PatientDetailPage() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
               <h3 className="text-xl font-bold text-gray-900">Reports</h3>
-              <Link
-                href={`/health-records?patientId=${patientId}`}
-                className="sv-btn sv-btn-outline"
-              >
-                Open Reports
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={`/api/patients/${patientId}/export`}
+                  className="sv-btn sv-btn-outline"
+                >
+                  Download zip export
+                </a>
+                <Link
+                  href={`/health-records?patientId=${patientId}`}
+                  className="sv-btn sv-btn-outline"
+                >
+                  Open Reports
+                </Link>
+              </div>
             </div>
 
             {recordsLoading ? (

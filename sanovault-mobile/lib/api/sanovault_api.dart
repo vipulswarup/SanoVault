@@ -399,6 +399,31 @@ class SanoVaultApi {
     }) as Map<String, dynamic>;
   }
 
+  Future<List<Map<String, dynamic>>> careShares() async {
+    final json = await _client.get('/api/care-shares') as List;
+    return json
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
+  Future<Map<String, dynamic>> createCareShare({
+    required List<String> patientIds,
+    String? label,
+    String? invitedEmail,
+  }) async {
+    return await _client.post('/api/care-shares', {
+      'patientIds': patientIds,
+      if (label != null && label.isNotEmpty) 'label': label,
+      if (invitedEmail != null && invitedEmail.isNotEmpty)
+        'invitedEmail': invitedEmail,
+    }) as Map<String, dynamic>;
+  }
+
+  Future<void> revokeCareShare(String id) async {
+    await _client.delete('/api/care-shares/$id');
+  }
+
   Future<Map<String, dynamic>> uploadDocument(
     List<int> bytes,
     String filename, {

@@ -187,7 +187,15 @@ export function reportTitle(input: ReportTitleInput): string {
     return [date, toPascalToken(customType)].filter(Boolean).join('-');
   }
 
-  const testType = toPascalToken(stringField(data, 'testType') || '')
+  const multiTests = Array.isArray(data.testTypes)
+    ? data.testTypes.map((item) => toPascalToken(String(item || ''))).filter(Boolean).slice(0, 5)
+    : [];
+  if (multiTests.length > 1) {
+    return [date, multiTests.join(',')].filter(Boolean).join('-');
+  }
+
+  const testType = multiTests[0]
+    || toPascalToken(stringField(data, 'testType') || '')
     || pickMapped(tags, TEST_TYPE_BY_TAG, TEST_TYPE_PRIORITY)
     || fallbackTestType(recordType, tags);
   const organ = toPascalToken(stringField(data, 'bodyPart') || '')

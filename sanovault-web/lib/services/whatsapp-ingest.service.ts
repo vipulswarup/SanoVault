@@ -87,6 +87,7 @@ export async function processWhatsAppIngest(inboundId: string): Promise<void> {
           idType: null as string | null,
           expiryDate: null as string | null,
           testType: null as string | null,
+          testTypes: [] as string[],
           bodyPart: null as string | null,
           tags: [] as string[],
         }
@@ -101,6 +102,7 @@ export async function processWhatsAppIngest(inboundId: string): Promise<void> {
 
     const data: Record<string, unknown> = {};
     if (analysis.testType) data.testType = analysis.testType;
+    if (analysis.testTypes?.length) data.testTypes = analysis.testTypes;
     if (analysis.bodyPart) data.bodyPart = analysis.bodyPart;
     if (recordType === 'ID_DOCUMENT') {
       if (analysis.idType) data.idType = analysis.idType;

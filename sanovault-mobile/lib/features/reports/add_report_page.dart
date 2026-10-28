@@ -133,23 +133,32 @@ class _AddReportPageState extends State<AddReportPage>
 
   Future<void> _pickGallery() async {
     await _beginPick(() async {
-      final shot = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-      );
-      if (shot == null) {
+      final shots = await ImagePicker().pickMultiImage(imageQuality: 85);
+      if (shots.isEmpty) {
         if (mounted) setState(() => _status = '');
         return;
       }
-      final bytes = await shot.readAsBytes();
-      await _process(bytes, _jpegFilename(shot.name));
+      // One record per image (combine-into-PDF is handled on web prepare).
+      for (var index = 0; index < shots.length; index += 1) {
+        final shot = shots[index];
+        if (mounted) {
+          setState(() => _status = 'Uploading image ${index + 1} of ${shots.length}…');
+        }
+        final bytes = await shot.readAsBytes();
+        await _process(
+          bytes,
+          _jpegFilename(shot.name),
+          autoSave: index < shots.length - 1,
+        );
+      }
     });
   }
 
   Future<void> _pickFile() async {
     await _beginPick(() async {
-      final file = await FilePicker.pickFile(
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
+        allowMultiple: true,
         allowedExtensions: [
           'pdf',
           'jpg',
@@ -170,11 +179,24 @@ class _AddReportPageState extends State<AddReportPage>
           'pptx',
         ],
       );
-      if (file == null) {
+      if (files.isEmpty) {
         if (mounted) setState(() => _status = '');
         return;
       }
-      await _process(await file.readAsBytes(), file.name);
+      for (var index = 0; index < files.length; index += 1) {
+        final file = files[index];
+        final bytes = file.path != null
+            ? await File(file.path!).readAsBytes()
+            : await file.readAsBytes();
+        if (mounted) {
+          setState(() => _status = 'Uploading file ${index + 1} of ${files.length}…');
+        }
+        await _process(
+          bytes,
+          file.name,
+          autoSave: index < files.length - 1,
+        );
+      }
     });
   }
 
@@ -186,7 +208,11 @@ class _AddReportPageState extends State<AddReportPage>
     return '$base.jpg';
   }
 
-  Future<void> _process(List<int> bytes, String filename) async {
+  Future<void> _process(
+    List<int> bytes,
+    String filename, {
+    bool autoSave = false,
+  }) async {
     final api = SessionScope.of(context).api;
     setState(() => _status = 'Uploading…');
     Map<String, dynamic> uploaded;
@@ -208,6 +234,33 @@ class _AddReportPageState extends State<AddReportPage>
         _status = 'Saved on this phone. It will upload when you are online.';
       });
       return;
+    }
+    if (uploaded['duplicate'] == true) {
+      if (!mounted) return;
+      final keep = await showCupertinoDialog<bool>(
+        context: context,
+        builder: (dialogContext) => CupertinoAlertDialog(
+          title: const Text('Possible duplicate'),
+          content: Text(
+            '$filename looks identical to a file already saved for this person. Keep the existing file and skip this upload?',
+          ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Skip duplicate'),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Open existing'),
+            ),
+          ],
+        ),
+      );
+      if (keep != false) {
+        if (autoSave) return;
+        // Fall through to review the existing document.
+      }
     }
     final documentId =
         uploaded['id'] as String? ??
@@ -275,8 +328,25 @@ class _AddReportPageState extends State<AddReportPage>
     setState(() {
       _ocrText = text;
       _recordType = type;
-      _status = 'Ready to save.';
+      _status = autoSave ? 'Saving…' : 'Ready to save.';
     });
+    if (autoSave && _patientId != null) {
+      await api.createHealthRecord({
+        'patientId': _patientId,
+        'recordType': type,
+        'data': <String, dynamic>{},
+        'source': 'Not specified',
+        'documentDate': formatIsoDate(_date),
+        'documentId': documentId,
+        if (text.isNotEmpty) 'ocrText': text,
+      });
+      if (!mounted) return;
+      setState(() {
+        _documentId = null;
+        _ocrText = '';
+        _status = 'Saved. Continuing…';
+      });
+    }
   }
 
   Future<void> _save() async {
