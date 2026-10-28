@@ -370,10 +370,10 @@ class SanoVaultApi {
     );
   }
 
-  Future<String> reportSummary(String id) async {
+  Future<String> reportSummary(String id, {bool force = false}) async {
     final result = await _client.post(
       '/api/health-records/$id/summary',
-      null,
+      {'force': force},
       const Duration(seconds: 60),
     ) as Map<String, dynamic>;
     return result['summary'] as String;
@@ -391,6 +391,12 @@ class SanoVaultApi {
         .whereType<Map>()
         .map((item) => Category.fromJson(Map<String, dynamic>.from(item)))
         .toList();
+  }
+
+  Future<Map<String, dynamic>> resolveRecordType(String label) async {
+    return await _client.post('/api/health-record-categories/resolve', {
+      'label': label,
+    }) as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> uploadDocument(

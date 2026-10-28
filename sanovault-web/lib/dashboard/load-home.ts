@@ -1,18 +1,10 @@
 import { sql } from '@/lib/db/neon';
+import { toCalendarDay } from '@/lib/dates/calendar-date';
 import { BETA_ACKNOWLEDGEMENT_VERSION } from '@/lib/legal/beta-acknowledgement';
 import { reportTitle } from '@/lib/reports/report-title';
 
 function toIsoDay(value: unknown): string | undefined {
-  if (value == null) return undefined;
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return value.toISOString().slice(0, 10);
-  }
-  const text = String(value);
-  const iso = text.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (iso) return iso[1];
-  const parsed = new Date(text);
-  if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
-  return text;
+  return toCalendarDay(value);
 }
 
 function toIsoInstant(value: unknown): string {

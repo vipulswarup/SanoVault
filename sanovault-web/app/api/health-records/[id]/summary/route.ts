@@ -9,12 +9,19 @@ import { generatePractitionerSummary, validatePractitionerSummary } from '@/lib/
 
 export const maxDuration = 60;
 
-export async function POST(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getCurrentUser();
     if (!user) throw new AppError('Unauthorized', 401);
     const { id } = await params;
     if (!z.string().uuid().safeParse(id).success) throw new AppError('Invalid health record ID', 400);
+    let force = false;
+    try {
+      const body = await request.json();
+      force = Boolean(body?.force);
+    } catch {
+      force = false;
+    }
     const [record] = await sql`
       SELECT hr.* FROM health_records hr
       WHERE hr.id = ${id}::uuid AND EXISTS (
@@ -38,7 +45,7 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
     const sourceHash = createHash('sha256').update(`v1:${source}`).digest('hex');
     const cached = record.data?.practitionerSummary;
     let summary: string | undefined;
-    if (cached?.sourceHash === sourceHash) {
+    if (!force && cached?.sourceHash === sourceHash) {
       try { summary = validatePractitionerSummary(cached.text); } catch { /* Regenerate invalid cached output. */ }
     }
     if (!summary) {

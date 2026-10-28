@@ -10,10 +10,18 @@ const _monthIndex = {
 
 DateTime? parseApiDate(String? value) {
   if (value == null || value.isEmpty) return null;
+  // Prefer calendar day so UTC midnight ISO strings do not shift locally.
+  final day = RegExp(r'^(\d{4})-(\d{2})-(\d{2})').firstMatch(value);
+  if (day != null) {
+    final year = int.tryParse(day.group(1)!);
+    final month = int.tryParse(day.group(2)!);
+    final date = int.tryParse(day.group(3)!);
+    if (year != null && month != null && date != null) {
+      return DateTime(year, month, date);
+    }
+  }
   final iso = DateTime.tryParse(value);
   if (iso != null) return iso;
-  final day = RegExp(r'^(\d{4}-\d{2}-\d{2})').firstMatch(value);
-  if (day != null) return DateTime.tryParse(day.group(1)!);
   final js = RegExp(r'^[A-Za-z]{3} ([A-Za-z]{3}) (\d{1,2}) (\d{4})').firstMatch(value);
   if (js != null) {
     final month = _monthIndex[js.group(1)!];

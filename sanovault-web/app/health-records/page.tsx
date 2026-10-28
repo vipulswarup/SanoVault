@@ -13,6 +13,7 @@ import { HealthcareSource } from '@/lib/types/healthcare-source.types';
 import { humanizeLabel } from '@/lib/constants/labels';
 import { getLastPatientId, setLastPatientId } from '@/lib/patients/last-used';
 import { svBtnOutline, svBtnPrimary } from '@/lib/ui/buttons';
+import { formatCalendarDay, toCalendarDay } from '@/lib/dates/calendar-date';
 
 interface HealthRecord {
   id: string;
@@ -247,6 +248,13 @@ function HealthRecordsContent() {
   }
 
   const formatDate = (dateString: string) => {
+    if (toCalendarDay(dateString)) {
+      return formatCalendarDay(dateString, 'en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    }
     try {
       return new Intl.DateTimeFormat('en-IN', {
         day: 'numeric',

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:sanovault/theme/sv_colors.dart';
 import 'package:sanovault/api/models.dart';
 import 'package:sanovault/features/reports/document_view_page.dart';
+import 'package:sanovault/features/reports/edit_record_page.dart';
 import 'package:sanovault/session/session_scope.dart';
 import 'package:sanovault/util/dates.dart';
 import 'package:sanovault/util/labels.dart';
@@ -48,14 +49,14 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
     }
   }
 
-  Future<void> _loadSummary() async {
+  Future<void> _loadSummary({bool force = false}) async {
     setState(() {
       _loadingSummary = true;
       _summaryError = null;
     });
     try {
       final summary = await SessionScope.of(context).api
-          .reportSummary(widget.recordId);
+          .reportSummary(widget.recordId, force: force);
       if (!mounted) return;
       setState(() => _summary = summary);
     } catch (caught) {
@@ -64,6 +65,19 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
     } finally {
       if (mounted) setState(() => _loadingSummary = false);
     }
+  }
+
+  Future<void> _edit() async {
+    final record = _record;
+    if (record == null) return;
+    final updated = await Navigator.of(context).push<HealthRecord>(
+      CupertinoPageRoute(
+        builder: (_) => EditRecordPage(record: record),
+      ),
+    );
+    if (!mounted || updated == null) return;
+    setState(() => _record = updated);
+    await _loadSummary();
   }
 
   Future<void> _approveReview() async {
@@ -103,6 +117,13 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
     return SvLargePage(
       title: record == null ? 'Report' : record.displayTitle,
       error: _error,
+      trailing: record == null
+          ? null
+          : CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _edit,
+              child: const Text('Edit'),
+            ),
       child: record == null
           ? const Padding(
               padding: EdgeInsets.only(top: 48),
@@ -214,14 +235,20 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                             else if (_summaryError != null) ...[
                               Text(_summaryError!),
                               CupertinoButton(
-                                onPressed: _loadSummary,
+                                onPressed: () => _loadSummary(),
                                 child: const Text('Retry summary'),
                               ),
-                            ] else
+                            ] else ...[
                               Text(
                                 _summary ?? '',
                                 style: const TextStyle(height: 1.5),
                               ),
+                              CupertinoButton(
+                                padding: const EdgeInsets.only(top: 8),
+                                onPressed: () => _loadSummary(force: true),
+                                child: const Text('Regenerate summary'),
+                              ),
+                            ],
                             const SizedBox(height: 8),
                             const Text(
                               'AI generated · Verify against the original report.',

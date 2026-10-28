@@ -1,4 +1,5 @@
 import { RECORD_TYPE_LABELS } from '@/lib/constants/labels';
+import { toCalendarDay } from '@/lib/dates/calendar-date';
 
 const NOISE_TAGS = new Set([
   'needs_review', 'folder_check', 'whatsapp', 'mobile_share', 'lab_report', 'imaging',
@@ -117,14 +118,7 @@ export type ReportTitleInput = {
 };
 
 function isoDay(value: unknown): string | undefined {
-  if (value == null || value === '') return undefined;
-  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
-  const text = String(value);
-  const iso = text.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (iso) return iso[1];
-  const parsed = new Date(text);
-  if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
-  return undefined;
+  return toCalendarDay(value);
 }
 
 function tagList(tags: unknown): string[] {
@@ -174,15 +168,23 @@ function fallbackTestType(recordType: string | undefined, tags: string[]): strin
 }
 
 export function reportTitle(input: ReportTitleInput): string {
+  const data = input.data || {};
+  const override = stringField(data, 'titleOverride');
+  if (override) return override;
+
   const date = isoDay(input.documentDate) || isoDay(input.createdAt) || 'undated';
   const tags = tagList(input.tags);
-  const data = input.data || {};
   const recordType = String(input.recordType || 'OTHER');
+  const customType = stringField(data, 'customTypeLabel');
 
   if (recordType.toUpperCase() === 'ID_DOCUMENT') {
     const idType = stringField(data, 'idType');
     const parts = [date, idType ? toPascalToken(idType) : 'Id'];
     return parts.join('-');
+  }
+
+  if (recordType.toUpperCase() === 'OTHER' && customType) {
+    return [date, toPascalToken(customType)].filter(Boolean).join('-');
   }
 
   const testType = toPascalToken(stringField(data, 'testType') || '')

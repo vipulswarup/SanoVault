@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { toCalendarDay } from '@/lib/dates/calendar-date';
 import { buildBloodReportSummary, formatLabResultValue, hasManualLabOverride, normalizeLabUnit, readManualLabResults } from '@/lib/reports/blood-summary';
 import { reportTitle } from '@/lib/reports/report-title';
 
@@ -22,8 +23,7 @@ export type PatientOverview = {
 };
 
 export function day(value: unknown): string {
-  if (value instanceof Date) return value.toISOString().slice(0, 10);
-  return value ? String(value).slice(0, 10) : '';
+  return toCalendarDay(value) || (value ? String(value).slice(0, 10) : '');
 }
 
 function dataObject(value: unknown): Row {
