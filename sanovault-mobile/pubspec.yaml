@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.0.4+202
+version: 4.0.0+400
 
 environment:
   sdk: ^3.13.0
@@ -46,11 +46,12 @@ dependencies:
   mime: ^2.1.0
   cunning_document_scanner: ^3.0.3
   http_parser: ^4.1.2
-  pdfrx: ^2.6.1
+  # Pin PDF stack: newer pdfrx_coregraphics breaks on current Xcode PDFKit APIs.
+  pdfrx: 2.6.1
   # Apple PDFKit backend; after `flutter pub get` run:
   # dart run tool/remove_darwin_pdfium.dart
   # dart run tool/patch_pdfrx_coregraphics_sdk.dart
-  pdfrx_coregraphics: ^0.4.0
+  pdfrx_coregraphics: 0.4.0
   share_handler: ^0.0.25
   path: ^1.9.1
 
