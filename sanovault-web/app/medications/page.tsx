@@ -202,6 +202,12 @@ function MedicationsContent() {
     try {
       setSaving(true);
       setError('');
+      if (!formValues.startDate.trim()) {
+        throw new Error('Start date is required');
+      }
+      if (formValues.endDate && formValues.endDate < formValues.startDate) {
+        throw new Error('End date cannot be earlier than the start date');
+      }
       const response = await fetch('/api/medications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -213,8 +219,9 @@ function MedicationsContent() {
           frequency: formValues.frequency,
           route: formValues.route,
           startDate: formValues.startDate,
-          endDate: formValues.isActive ? null : (formValues.endDate || null),
+          endDate: formValues.endDate || null,
           instructions: formValues.instructions,
+          prescribedBy: formValues.prescribedBy || undefined,
           indication: formValues.indication,
           isActive: formValues.isActive,
           stoppedReason: formValues.isActive ? undefined : formValues.stoppedReason,
@@ -239,6 +246,12 @@ function MedicationsContent() {
     try {
       setSaving(true);
       setError('');
+      if (!formValues.startDate.trim()) {
+        throw new Error('Start date is required');
+      }
+      if (formValues.endDate && formValues.endDate < formValues.startDate) {
+        throw new Error('End date cannot be earlier than the start date');
+      }
       const response = await fetch(`/api/medications/${editingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -250,8 +263,9 @@ function MedicationsContent() {
           frequency: formValues.frequency,
           route: formValues.route,
           startDate: formValues.startDate,
-          endDate: formValues.isActive ? null : (formValues.endDate || new Date().toISOString().slice(0, 10)),
+          endDate: formValues.endDate || null,
           instructions: formValues.instructions,
+          prescribedBy: formValues.prescribedBy || '',
           indication: formValues.indication,
           isActive: formValues.isActive,
           stoppedReason: formValues.isActive ? '' : formValues.stoppedReason,
@@ -475,6 +489,15 @@ function MedicationsContent() {
                       </div>
 
                       <p className="mt-3 text-sm text-gray-600">{medication.dosage} · {medication.frequency} · {medication.route}</p>
+                      {(medication.startDate || medication.endDate) && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          {medication.startDate ? `From ${String(medication.startDate).slice(0, 10)}` : ''}
+                          {medication.endDate ? ` · Until ${String(medication.endDate).slice(0, 10)}` : ''}
+                        </p>
+                      )}
+                      {medication.prescribedBy ? (
+                        <p className="mt-1 text-sm text-gray-600">Prescribed by {medication.prescribedBy}</p>
+                      ) : null}
                       {medication.instructions && <p className="mt-1 text-sm text-gray-600">Original instructions: {medication.instructions}</p>}
                       {!medication.isActive && medication.stoppedReason && (
                         <p className="mt-1 text-sm text-gray-600">Stopped because: {medication.stoppedReason}</p>

@@ -76,15 +76,16 @@ function HealthRecordsContent() {
     if (patientFromUrl) setSelectedPatientId(patientFromUrl);
   }, [searchParams]);
 
+  // Prefer Next searchParams over window.location — router.replace does not update the latter synchronously.
   const updateQuery = useCallback((updates: Record<string, string>) => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value) params.set(key, value);
       else params.delete(key);
     });
     const query = params.toString();
     router.replace(query ? `/health-records?${query}` : '/health-records', { scroll: false });
-  }, [router]);
+  }, [router, searchParams]);
 
   const getRecordTypeLabel = (code: string): string => {
     const category = categories.find(cat => cat.code === code);
@@ -116,9 +117,11 @@ function HealthRecordsContent() {
   }, []);
 
   useEffect(() => {
+    const urlKeyword = searchParams.get('keyword') || '';
+    if (keyword === urlKeyword) return;
     const timeoutId = window.setTimeout(() => updateQuery({ keyword }), 300);
     return () => window.clearTimeout(timeoutId);
-  }, [keyword, updateQuery]);
+  }, [keyword, searchParams, updateQuery]);
 
   const fetchPatients = useCallback(async () => {
     try {
@@ -152,29 +155,23 @@ function HealthRecordsContent() {
   const fetchRecords = useCallback(async () => {
     try {
       setRecordsLoading(true);
+      // URL is the source of truth for filters (avoids Needs review state/URL races).
+      const tag = searchParams.get('tag') || '';
+      const source = searchParams.get('source') || '';
+      const recordType = searchParams.get('recordType') || '';
+      const keywordParam = searchParams.get('keyword') || '';
+      const start = searchParams.get('startDate') || '';
+      const end = searchParams.get('endDate') || '';
+      const patientFromUrl = searchParams.get('patientId') || selectedPatientId;
       const params = new URLSearchParams();
-      
-      if (selectedPatientId) {
-        params.append('patientId', selectedPatientId);
-      }
-      if (keyword) {
-        params.append('keyword', keyword);
-      }
-      if (filterSource) {
-        params.append('source', filterSource);
-      }
-      if (filterRecordType) {
-        params.append('recordType', filterRecordType);
-      }
-      if (filterTag) {
-        params.append('tag', filterTag);
-      }
-      if (startDate) {
-        params.append('startDate', startDate);
-      }
-      if (endDate) {
-        params.append('endDate', endDate);
-      }
+
+      if (patientFromUrl) params.append('patientId', patientFromUrl);
+      if (keywordParam) params.append('keyword', keywordParam);
+      if (source) params.append('source', source);
+      if (recordType) params.append('recordType', recordType);
+      if (tag) params.append('tag', tag);
+      if (start) params.append('startDate', start);
+      if (end) params.append('endDate', end);
 
       const response = await fetch(`/api/health-records?${params.toString()}`);
       if (!response.ok) {
@@ -187,7 +184,7 @@ function HealthRecordsContent() {
     } finally {
       setRecordsLoading(false);
     }
-  }, [endDate, filterRecordType, filterSource, filterTag, keyword, selectedPatientId, startDate]);
+  }, [searchParams, selectedPatientId]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -201,11 +198,8 @@ function HealthRecordsContent() {
   }, [fetchCategories, fetchPatients, fetchSources, router, session?.user?.id, status]);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      void fetchRecords();
-    }, keyword ? 300 : 0);
-    return () => clearTimeout(timeoutId);
-  }, [fetchRecords, keyword]);
+    void fetchRecords();
+  }, [fetchRecords]);
 
   const handleDelete = async (id: string) => {
     try {

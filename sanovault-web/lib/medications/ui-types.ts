@@ -31,6 +31,7 @@ export type Medication = {
   startDate: string;
   endDate: string | null;
   instructions: string;
+  prescribedBy: string;
   isActive: boolean;
   composition: {
     status: 'CONFIRMED' | 'UNCONFIRMED' | 'REVIEW_NEEDED';
@@ -53,6 +54,7 @@ export type MedicationFormValues = {
   endDate: string;
   instructions: string;
   indication: string;
+  prescribedBy: string;
   isActive: boolean;
   stoppedReason: string;
   selectedProduct: CatalogueProduct | null;
@@ -87,6 +89,7 @@ export function defaultFormValues(): MedicationFormValues {
     endDate: '',
     instructions: '',
     indication: '',
+    prescribedBy: '',
     isActive: true,
     stoppedReason: '',
     selectedProduct: null,
@@ -108,6 +111,7 @@ export function formValuesFromMedication(medication: Medication): MedicationForm
     endDate: medication.endDate ? String(medication.endDate).slice(0, 10) : '',
     instructions: medication.instructions,
     indication: medication.indication,
+    prescribedBy: medication.prescribedBy || '',
     isActive: medication.isActive,
     stoppedReason: medication.stoppedReason,
     selectedProduct: medication.composition.status === 'CONFIRMED' && medication.composition.catalogProductId

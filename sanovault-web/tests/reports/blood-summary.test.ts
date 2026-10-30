@@ -101,6 +101,50 @@ SAROGLITAZAR 4 0 - 10 mg/dL
   assert.ok(!results.some((result) => /cefixime|esomeprazole|metronidazole|ramosetron|saroglitazar|vitamin e/i.test(result.label)));
 });
 
+test('drops persisted prescription-like labResults from Blood Work', () => {
+  const summary = buildBloodReportSummary([{
+    id: 'report-rx',
+    date: new Date('2026-08-12'),
+    source: 'Discharge',
+    useManualResults: true,
+    manualResults: [
+      {
+        metric: 'hemoglobin',
+        label: 'Hemoglobin',
+        panel: 'blood',
+        value: 13.2,
+        valueType: 'numeric',
+        rawValue: '13.2',
+        rangeValueLow: null,
+        rangeValueHigh: null,
+        unit: 'g/dL',
+        referenceLow: 12,
+        referenceHigh: 15,
+        status: 'normal',
+      },
+      {
+        metric: 'unmapped_other_cefixime_200',
+        label: '(CEFIXIME 200',
+        panel: 'blood',
+        value: 0,
+        valueType: 'numeric',
+        rawValue: '0',
+        rangeValueLow: null,
+        rangeValueHigh: null,
+        unit: 'mg/dL',
+        referenceLow: 0,
+        referenceHigh: 500,
+        rawLabel: '(CEFIXIME 200',
+        mappingConfidence: 'unmapped',
+        status: 'unknown',
+      },
+    ],
+  }]);
+  assert.equal(summary.comparisons.length, 1);
+  assert.equal(summary.comparisons[0].metric, 'hemoglobin');
+  assert.ok(!summary.panels.some((panel) => panel.comparisons.some((c) => /cefixime/i.test(c.label))));
+});
+
 test('applies a user-confirmed source alias before fuzzy normalization', () => {
   const [result] = parseBloodResults(
     'THYROID\nTHYROTROPIN THIRD GENERATION 2.1 0.4 - 4.0 mIU/L',
