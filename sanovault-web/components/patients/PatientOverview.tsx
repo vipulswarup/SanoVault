@@ -7,14 +7,53 @@ import type { PatientOverview as Overview, TimelineEntry } from '@/lib/patients/
 function date(value: string) {
   return value ? new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Undated';
 }
-function timelineHref(entry: TimelineEntry, id: string) {
-  return entry.kind === 'report' ? `/health-records/${entry.recordId}` : entry.kind === 'medication' ? `/medications?patientId=${id}` : `/visit-notes?patientId=${id}`;
+
+export type OverviewLinkFor = {
+  tag: (tag: string, patientId: string) => string;
+  timeline: (entry: TimelineEntry, patientId: string) => string;
+  pathology: (recordId: string, patientId: string) => string;
+};
+
+function defaultLinkFor(): OverviewLinkFor {
+  return {
+    tag: (tag, patientId) => `/health-records?${new URLSearchParams({ patientId, tag })}`,
+    timeline: (entry, patientId) => (
+      entry.kind === 'report'
+        ? `/health-records/${entry.recordId}`
+        : entry.kind === 'medication'
+          ? `/medications?patientId=${patientId}`
+          : `/visit-notes?patientId=${patientId}`
+    ),
+    pathology: (recordId) => `/health-records/${recordId}`,
+  };
 }
 
-export function PatientOverviewContent({ overview, summaryLoading = false, summaryError = '', onRetry }: {
-  overview: Overview; summaryLoading?: boolean; summaryError?: string; onRetry?: () => void;
+/** Care vault: keep deep links inside `/care/[token]/patients/[id]/...`. */
+export function careOverviewLinkFor(basePath: string): OverviewLinkFor {
+  const base = basePath.replace(/\/$/, '');
+  return {
+    tag: (tag) => `${base}/reports?${new URLSearchParams({ tag })}`,
+    timeline: (entry) => (
+      entry.kind === 'report'
+        ? `${base}/reports/${entry.recordId}`
+        : entry.kind === 'medication'
+          ? `${base}/medications`
+          : `${base}/notes`
+    ),
+    pathology: (recordId) => `${base}/reports/${recordId}`,
+  };
+}
+
+export function PatientOverviewContent({ overview, summaryLoading = false, summaryError = '', onRetry, linkFor, emptySummaryHint }: {
+  overview: Overview;
+  summaryLoading?: boolean;
+  summaryError?: string;
+  onRetry?: () => void;
+  linkFor?: OverviewLinkFor;
+  emptySummaryHint?: string;
 }) {
   const id = overview.patient.id;
+  const links = linkFor || defaultLinkFor();
   return (
     <div className="space-y-7">
       <section aria-labelledby="case-summary-heading">
@@ -24,9 +63,15 @@ export function PatientOverviewContent({ overview, summaryLoading = false, summa
             {overview.caseSummary.stale && <p className="mb-2 text-sm font-semibold text-danger-strong">Records have changed · Previous summary</p>}
             <p className="whitespace-pre-line text-sm leading-7 text-ink">{overview.caseSummary.text}</p>
             <p className="mt-3 text-xs text-slate">AI generated · Saved {date(overview.caseSummary.generatedAt)} · Verify against source records.</p>
-          </> : !overview.hasEvidence ? <p className="text-sm text-slate">Add reports, medicines or notes to build a case summary.</p> : null}
+          </> : !overview.hasEvidence ? (
+            <p className="text-sm text-slate">{emptySummaryHint || 'Add reports, medicines or notes to build a case summary.'}</p>
+          ) : emptySummaryHint && !summaryLoading ? (
+            <p className="text-sm text-slate">{emptySummaryHint}</p>
+          ) : null}
           {summaryLoading && <p className="mt-2 text-sm text-slate" role="status">{overview.caseSummary ? 'Updating saved summary…' : 'Preparing case summary…'}</p>}
-          {summaryError && <div className="mt-2 text-sm"><p role="alert">{summaryError}</p><button type="button" onClick={onRetry} className="min-h-11 font-medium text-brand-strong underline">Retry summary</button></div>}
+          {summaryError && onRetry ? (
+            <div className="mt-2 text-sm"><p role="alert">{summaryError}</p><button type="button" onClick={onRetry} className="min-h-11 font-medium text-brand-strong underline">Retry summary</button></div>
+          ) : null}
         </div>
       </section>
 
@@ -36,7 +81,7 @@ export function PatientOverviewContent({ overview, summaryLoading = false, summa
         <div tabIndex={0} role="region" aria-label="Health topics, scroll for more tags" className="mt-3 max-h-48 overflow-y-auto overscroll-contain rounded-2xl border border-silver bg-white p-3">
           <div className="flex flex-wrap items-center gap-2">
             {overview.tags.map(({ tag, count, weight }) => (
-              <Link key={tag} href={`/health-records?${new URLSearchParams({ patientId: id, tag })}`} prefetch={false}
+              <Link key={tag} href={links.tag(tag, id)} prefetch={false}
                 aria-label={`${tag.replaceAll('_', ' ')}: ${count} ${count === 1 ? 'report' : 'reports'}`}
                 style={{ fontSize: `${14 + Math.round(10 * weight)}px` }}
                 className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 font-medium text-brand-strong hover:bg-brand-tint">
@@ -54,7 +99,7 @@ export function PatientOverviewContent({ overview, summaryLoading = false, summa
           <div className="flex gap-4 bg-cream px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate"><span className="w-24 shrink-0">Date</span><span>Documented events</span></div>
           <div tabIndex={0} role="region" aria-label="Treatment timeline, scroll for more events" className="max-h-72 overflow-y-auto overscroll-contain">
             {overview.timeline.map((entry) => (
-              <Link key={entry.id} href={timelineHref(entry, id)} prefetch={false} className="flex h-24 items-center gap-4 border-b border-silver/50 px-4 last:border-0 hover:bg-brand-tint">
+              <Link key={entry.id} href={links.timeline(entry, id)} prefetch={false} className="flex h-24 items-center gap-4 border-b border-silver/50 px-4 last:border-0 hover:bg-brand-tint">
                 <div className="w-24 shrink-0 text-sm text-slate"><time>{date(entry.date)}</time>{entry.dateIsUpload && <span className="block text-xs">Uploaded</span>}</div>
                 <div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm font-semibold text-ink">{entry.title}</p><p className="mt-1 line-clamp-1 text-xs text-slate">{entry.detail}</p></div>
                 <span aria-hidden className="text-brand-strong">↗</span>
@@ -72,12 +117,12 @@ export function PatientOverviewContent({ overview, summaryLoading = false, summa
           <div className="flex justify-between bg-cream px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate"><span>Parameter</span><span>Latest / previous</span></div>
           <div tabIndex={0} role="region" aria-label="Pathology trend, scroll for more parameters" className="max-h-72 overflow-y-auto overscroll-contain">
             {overview.pathology.map((entry) => (
-              <Link key={entry.metric} href={`/health-records/${entry.recordId}`} prefetch={false} className="flex h-24 items-center justify-between gap-3 border-b border-silver/50 px-4 last:border-0 hover:bg-brand-tint">
+              <Link key={entry.metric} href={links.pathology(entry.recordId, id)} prefetch={false} className="flex h-24 items-center justify-between gap-3 border-b border-silver/50 px-4 last:border-0 hover:bg-brand-tint">
                 <div className="min-w-0 flex-1"><p className="line-clamp-1 text-sm font-semibold text-ink">{entry.label}</p><p className="mt-1 text-xs text-slate">{date(entry.date)} · {entry.trend}</p><p className="line-clamp-1 text-xs text-slate">{entry.reference ? `Reference: ${entry.reference}` : 'No reference range documented'}</p></div>
                 <div className="max-w-[45%] text-right"><p className={`text-sm font-semibold ${['high', 'low', 'abnormal'].includes(entry.status) ? 'text-danger-strong' : 'text-ink'}`}>{entry.latest}</p><p className="text-xs text-slate">{entry.status === 'unknown' ? 'No range' : entry.status}</p>{entry.previous && <p className="text-xs text-slate">{entry.previous} · {date(entry.previousDate || '')}</p>}</div>
               </Link>
             ))}
-            {overview.pathology.length === 0 && <p className="p-5 text-sm text-slate">No readable pathology results yet. Add a lab report from Reports.</p>}
+            {overview.pathology.length === 0 && <p className="p-5 text-sm text-slate">No readable pathology results yet.</p>}
           </div>
         </div>
         <p className="mt-2 text-xs text-slate">Latest and previous documented results. Direction alone does not indicate improvement or deterioration.</p>

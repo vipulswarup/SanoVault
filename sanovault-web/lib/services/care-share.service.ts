@@ -2,7 +2,6 @@ import { randomBytes } from 'crypto';
 import { sql } from '@/lib/db/neon';
 import { canAccessPatient } from '@/lib/households/access';
 import { toCalendarDay } from '@/lib/dates/calendar-date';
-import { reportTitle } from '@/lib/reports/report-title';
 import { appBaseUrl } from '@/lib/site';
 
 export type CareShare = {
@@ -183,56 +182,48 @@ export async function listDoctorCareShares(userId: string): Promise<CareShare[]>
   return result;
 }
 
+export type CarePatientSummary = {
+  id: string;
+  name: string;
+  dateOfBirth: string | null;
+};
+
+export async function assertCarePatientAccess(token: string, patientId: string): Promise<{
+  share: CareShare;
+  patient: Record<string, unknown>;
+} | null> {
+  const share = await getCareShareByToken(token);
+  if (!share || !share.patientIds.includes(patientId)) return null;
+  const [patient] = await sql`
+    SELECT * FROM patients WHERE id = ${patientId}::uuid LIMIT 1
+  `;
+  if (!patient) return null;
+  return { share, patient };
+}
+
 export async function loadCareShareView(token: string) {
   const share = await getCareShareByToken(token);
   if (!share) return null;
   await touchCareShareView(token);
 
-  const patients = [];
+  const patients: CarePatientSummary[] = [];
   for (const patientId of share.patientIds) {
     const [patient] = await sql`
       SELECT id, first_name, last_name, date_of_birth FROM patients WHERE id = ${patientId}::uuid
     `;
     if (!patient) continue;
-    const records = await sql`
-      SELECT id, record_type, source, doctor_name, document_date, created_at, tags, data, document_id
-      FROM health_records
-      WHERE patient_id = ${patientId}::uuid
-      ORDER BY COALESCE(document_date, created_at::date) DESC, created_at DESC
-      LIMIT 200
-    `;
     patients.push({
       id: String(patient.id),
       name: [patient.first_name, patient.last_name].filter(Boolean).join(' ').trim(),
       dateOfBirth: toCalendarDay(patient.date_of_birth) || null,
-      records: records.map((row) => {
-        const data = row.data && typeof row.data === 'object' && !Array.isArray(row.data)
-          ? row.data as Record<string, unknown>
-          : {};
-        const tags = Array.isArray(row.tags) ? row.tags.map(String) : [];
-        return {
-          id: String(row.id),
-          recordType: String(row.record_type || ''),
-          source: String(row.source || ''),
-          doctorName: row.doctor_name ? String(row.doctor_name) : null,
-          documentDate: toCalendarDay(row.document_date) || null,
-          documentId: row.document_id ? String(row.document_id) : null,
-          title: reportTitle({
-            documentDate: row.document_date,
-            createdAt: row.created_at,
-            recordType: String(row.record_type || ''),
-            tags,
-            data,
-          }),
-          summary: typeof data.practitionerSummary === 'object'
-            && data.practitionerSummary
-            && typeof (data.practitionerSummary as { text?: unknown }).text === 'string'
-            ? String((data.practitionerSummary as { text: string }).text)
-            : null,
-        };
-      }),
     });
   }
 
-  return { share, patients };
+  return {
+    share: {
+      label: share.label,
+      viewCount: share.viewCount,
+    },
+    patients,
+  };
 }

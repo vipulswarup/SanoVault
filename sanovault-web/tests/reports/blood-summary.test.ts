@@ -81,6 +81,24 @@ test('retains unfamiliar structured rows instead of dropping them', () => {
   assert.match(result.metric, /^unmapped_/);
   assert.equal(result.rawLabel, 'Apolipoprotein Qx');
   assert.equal(result.mappingConfidence, 'unmapped');
+  assert.equal(result.panel, 'other');
+});
+
+test('does not treat discharge medicines as Blood (CBC) tests', () => {
+  const results = parseBloodResults(`COMPLETE BLOOD COUNT
+Hemoglobin 13.2 12.0 - 15.0 g/dL
+ADVICE ON DISCHARGE
+(CEFIXIME 200 0 - 500 mg/dL
+ESOMEPRAZOLE (40 MG) 40 0 - 100 mg/dL
+METRONIDAZOLE 400 0 - 500 mg/dL
+RAMOSETRON 0.1 0 - 1 mg/dL
+SAROGLITAZAR 4 0 - 10 mg/dL
+(VITAMIN E 400 0 - 1000 mg/dL
+`);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].metric, 'hemoglobin');
+  assert.equal(results[0].panel, 'blood');
+  assert.ok(!results.some((result) => /cefixime|esomeprazole|metronidazole|ramosetron|saroglitazar|vitamin e/i.test(result.label)));
 });
 
 test('applies a user-confirmed source alias before fuzzy normalization', () => {

@@ -61,6 +61,21 @@ function HealthRecordsContent() {
   );
   const [recordPendingDelete, setRecordPendingDelete] = useState<string | null>(null);
 
+  // Keep filter state aligned with URL (Needs review / deep links update searchParams only).
+  useEffect(() => {
+    setKeyword(searchParams.get('keyword') || '');
+    setFilterSource(searchParams.get('source') || '');
+    setFilterRecordType(searchParams.get('recordType') || '');
+    setFilterTag(searchParams.get('tag') || '');
+    setStartDate(searchParams.get('startDate') || '');
+    setEndDate(searchParams.get('endDate') || '');
+    if (['source', 'recordType', 'tag', 'startDate', 'endDate'].some((key) => searchParams.has(key))) {
+      setShowFilters(true);
+    }
+    const patientFromUrl = searchParams.get('patientId') || '';
+    if (patientFromUrl) setSelectedPatientId(patientFromUrl);
+  }, [searchParams]);
+
   const updateQuery = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(window.location.search);
     Object.entries(updates).forEach(([key, value]) => {
@@ -275,12 +290,13 @@ function HealthRecordsContent() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-3xl font-bold text-ink">Reports</h1>
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/health-records?tag=needs_review"
+              <button
+                type="button"
+                onClick={() => handleTagClick('needs_review')}
                 className={`inline-flex min-h-12 items-center text-base font-medium ${filterTag === 'needs_review' ? 'text-ink underline' : 'text-coral hover:underline'}`}
               >
                 Needs review
-              </Link>
+              </button>
               <Link
                 href={selectedPatientId ? `/reports/blood-summary?patientId=${selectedPatientId}` : '/reports/blood-summary'}
                 className="inline-flex min-h-12 items-center text-base font-medium text-coral hover:underline"
