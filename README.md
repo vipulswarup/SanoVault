@@ -20,6 +20,7 @@ Each document has one job.
 | [DESIGN.md](./DESIGN.md) | Shared palette, navigation, ordering rules, offline and speed principles |
 | [FOLDER-CHECK.md](./FOLDER-CHECK.md) | Product spec for importing a local folder on a Mac |
 | [sanovault-web/README.md](./sanovault-web/README.md) | Web setup, environment variables, scripts, API reference, database |
+| [sanovault-web/openapi.yaml](./sanovault-web/openapi.yaml) | OpenAPI 3.0 for the `/api` HTTP surface (website + mobile) |
 | [sanovault-web/DEPLOYMENT.md](./sanovault-web/DEPLOYMENT.md) | Production hosting, regions, cron jobs, WhatsApp, account deletion |
 | [sanovault-web/TROUBLESHOOTING.md](./sanovault-web/TROUBLESHOOTING.md) | Build, environment, migration and runtime problems |
 | [sanovault-web/docs/](./sanovault-web/docs) | Medication Center spec; August 2026 usability review |
