@@ -81,6 +81,8 @@ Every health-data route authenticates with `getCurrentUser()` (`lib/auth/session
 
 All routes are under `/api` and accept either the website cookie or `Authorization: Bearer <mobile token>`. Methods listed are those implemented.
 
+Machine-readable contract: [openapi.yaml](./openapi.yaml) (OpenAPI 3.0). Prefer that file for request/response schemas; this table remains the quick route index.
+
 | Area | Routes |
 | --- | --- |
 | Auth | `/auth/[...path]` (Neon Auth); `POST /auth/mobile/apple`, `POST /auth/mobile/password`, `POST,DELETE /auth/mobile/session` |
