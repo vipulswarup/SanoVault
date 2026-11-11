@@ -104,6 +104,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             >
               ABHA vs personal health record
             </Link>
+            <Link
+              href="/guides/scan-old-medical-reports"
+              className="hover:text-ink"
+            >
+              Scan old medical reports
+            </Link>
             <Link href="/pricing" className="hover:text-ink">
               Pricing
             </Link>

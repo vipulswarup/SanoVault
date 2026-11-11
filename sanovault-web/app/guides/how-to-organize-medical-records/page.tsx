@@ -92,7 +92,9 @@ export default function OrganizeMedicalRecordsGuidePage() {
             Photograph or scan pages in good light, one page at a time, without covering the date or the letterhead. A phone camera is enough if the text is readable. Keep the original of discharge summaries and major imaging reports in a labelled envelope even after you digitise them.
           </p>
           <p className="mt-3 text-base leading-7 text-blue-slate">
-            You do not have to digitise a lifetime in one weekend. Start with the last two years and anything that involved a hospital stay.
+            For a step-by-step method, see{' '}
+            <Link href="/guides/scan-old-medical-reports" className="font-medium text-coral hover:underline">how to scan old paper medical reports</Link>.
+            {' '}You do not have to digitise a lifetime in one weekend. Start with the last two years and anything that involved a hospital stay.
           </p>
 
           <h2 className="mt-12 text-2xl font-bold tracking-tight">Prescriptions</h2>

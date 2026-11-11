@@ -119,6 +119,12 @@ const GUIDE_LINKS = [
       "What each one does, and whether you need both.",
   },
   {
+    href: "/guides/scan-old-medical-reports",
+    title: "Scan old paper medical reports",
+    description:
+      "Digitise old reports with just your phone, and what to do with the originals.",
+  },
+  {
     href: "/personal-health-record-app-india",
     title: "Personal health record for Indian families",
     description:
@@ -497,7 +503,7 @@ export function LandingPage() {
               Plain-language help for keeping your family&apos;s medical
               records in order.
             </p>
-            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {GUIDE_LINKS.map((item) => (
                 <li key={item.href}>
                   <Link
