@@ -94,15 +94,6 @@ const nextConfig: NextConfig = {
       './node_modules/pdfjs-dist/standard_fonts/**',
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: "/sites.xml",
-        destination: "/sitemap.xml",
-        permanent: true,
-      },
-    ];
-  },
   async headers() {
     return [
       {

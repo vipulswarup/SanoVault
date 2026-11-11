@@ -43,6 +43,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               >
                 Organise records
               </Link>
+              <Link
+                href="/guides/abha-vs-personal-health-record"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate hover:bg-white hover:text-ink"
+              >
+                ABHA vs PHR
+              </Link>
             </nav>
           </div>
           <nav
@@ -91,6 +97,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
               className="hover:text-ink"
             >
               How to organise medical records
+            </Link>
+            <Link
+              href="/guides/abha-vs-personal-health-record"
+              className="hover:text-ink"
+            >
+              ABHA vs personal health record
             </Link>
             <Link href="/pricing" className="hover:text-ink">
               Pricing
