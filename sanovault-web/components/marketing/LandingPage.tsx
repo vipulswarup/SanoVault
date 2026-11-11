@@ -171,6 +171,11 @@ const jsonLd = {
       name: SITE_NAME,
       url: CANONICAL_SITE_URL,
       logo: `${CANONICAL_SITE_URL}/logo.png`,
+      parentOrganization: {
+        "@type": "Organization",
+        name: "Argali Knowledge Services Pvt Ltd",
+        url: "https://www.eisenvault.com/",
+      },
     },
   ],
 };

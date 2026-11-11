@@ -16,6 +16,7 @@ export const MARKETING_ROUTES: MarketingRoute[] = [
   { path: '/guides/abha-vs-personal-health-record', lastModified: '2026-11-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/guides/scan-old-medical-reports', lastModified: '2026-11-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/guides/medical-records-for-elderly-parents', lastModified: '2026-11-11', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/about', lastModified: '2026-11-11', changeFrequency: 'yearly', priority: 0.5 },
   { path: '/pricing', lastModified: '2026-09-14', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/privacy', lastModified: '2026-09-14', changeFrequency: 'monthly', priority: 0.5 },
 ];
