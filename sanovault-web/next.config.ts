@@ -72,6 +72,10 @@ const privatePageSources = [
   "/beta-acknowledgement",
   "/auth/:path*",
   "/share/:path*",
+  "/care/:path*",
+  "/care-shares",
+  "/settings",
+  "/settings/:path*",
 ];
 
 const nextConfig: NextConfig = {
