@@ -125,6 +125,12 @@ const GUIDE_LINKS = [
       "Digitise old reports with just your phone, and what to do with the originals.",
   },
   {
+    href: "/guides/medical-records-for-elderly-parents",
+    title: "Medical records for elderly parents",
+    description:
+      "Where to start, what to gather, and how to share with siblings.",
+  },
+  {
     href: "/personal-health-record-app-india",
     title: "Personal health record for Indian families",
     description:

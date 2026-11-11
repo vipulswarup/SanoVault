@@ -97,6 +97,13 @@ export default function FamilyHealthRecordsPage() {
           <p className="mt-3 text-base leading-7 text-blue-slate">
             This is not a claim that adult children control a parent&apos;s healthcare. It is a filing system for documents a household is already managing together.
           </p>
+          <p className="mt-3 text-base leading-7 text-blue-slate">
+            For a step-by-step approach, read{' '}
+            <Link href="/guides/medical-records-for-elderly-parents" className="font-medium text-coral hover:underline">
+              how to keep medical records for elderly parents
+            </Link>
+            .
+          </p>
 
           <h2 className="mt-12 text-2xl font-bold tracking-tight">Records from different doctors</h2>
           <p className="mt-3 text-base leading-7 text-blue-slate">

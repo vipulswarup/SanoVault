@@ -110,6 +110,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             >
               Scan old medical reports
             </Link>
+            <Link
+              href="/guides/medical-records-for-elderly-parents"
+              className="hover:text-ink"
+            >
+              Medical records for elderly parents
+            </Link>
             <Link href="/pricing" className="hover:text-ink">
               Pricing
             </Link>
