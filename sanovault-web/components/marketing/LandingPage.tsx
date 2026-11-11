@@ -105,6 +105,33 @@ const HOME_FAQS: FaqItem[] = [
   },
 ];
 
+const GUIDE_LINKS = [
+  {
+    href: "/guides/how-to-organize-medical-records",
+    title: "How to organise medical records",
+    description:
+      "Which papers to keep, how to name files, and what to take to a doctor.",
+  },
+  {
+    href: "/guides/abha-vs-personal-health-record",
+    title: "ABHA vs personal health record",
+    description:
+      "What each one does, and whether you need both.",
+  },
+  {
+    href: "/personal-health-record-app-india",
+    title: "Personal health record for Indian families",
+    description:
+      "What a PHR is and how it differs from a hospital record.",
+  },
+  {
+    href: "/family-health-records",
+    title: "Family health records",
+    description:
+      "Keep records for children, parents and yourself in one folder.",
+  },
+];
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -455,7 +482,40 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="border-t border-silver/70 bg-background">
+        <section
+          className="border-t border-silver/70 bg-background"
+          aria-labelledby="guides-heading"
+        >
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <h2
+              id="guides-heading"
+              className="text-2xl font-bold tracking-tight sm:text-3xl"
+            >
+              Guides and explainers
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-blue-slate">
+              Plain-language help for keeping your family&apos;s medical
+              records in order.
+            </p>
+            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {GUIDE_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="block h-full rounded-2xl border border-silver bg-white p-6 hover:border-sage"
+                  >
+                    <h3 className="font-semibold text-ink">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-blue-slate">
+                      {item.description}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="border-t border-silver/70">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <FaqSection items={HOME_FAQS} />
           </div>
