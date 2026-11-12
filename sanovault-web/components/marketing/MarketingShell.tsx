@@ -116,6 +116,12 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             >
               Medical records for elderly parents
             </Link>
+            <Link
+              href="/guides/is-it-safe-to-store-medical-records-online"
+              className="hover:text-ink"
+            >
+              Is it safe to store records online?
+            </Link>
             <Link href="/pricing" className="hover:text-ink">
               Pricing
             </Link>

@@ -162,7 +162,9 @@ export default function OrganizeMedicalRecordsGuidePage() {
             Medical documents are sensitive. Prefer storage you control. Do not post reports in large family groups. Lock the phone and computer you use. If you share a file with a clinic, send only what they need, and avoid leaving copies on shop or hospital public computers.
           </p>
           <p className="mt-3 text-base leading-7 text-blue-slate">
-            India&apos;s Digital Personal Data Protection Act (DPDP) governs personal data in many contexts; this guide is not legal advice. Treat health files as confidential regardless of which tool you use.
+            For a fuller checklist, see{' '}
+            <Link href="/guides/is-it-safe-to-store-medical-records-online" className="font-medium text-coral hover:underline">is it safe to store medical records online</Link>.
+            {' '}India&apos;s Digital Personal Data Protection Act (DPDP) governs personal data in many contexts; this guide is not legal advice. Treat health files as confidential regardless of which tool you use.
           </p>
 
           <h2 className="mt-12 text-2xl font-bold tracking-tight">What to take to a doctor visit</h2>

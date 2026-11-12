@@ -131,6 +131,12 @@ const GUIDE_LINKS = [
       "Where to start, what to gather, and how to share with siblings.",
   },
   {
+    href: "/guides/is-it-safe-to-store-medical-records-online",
+    title: "Is it safe to store medical records online?",
+    description:
+      "Where the real risks are, and a checklist for judging any app.",
+  },
+  {
     href: "/personal-health-record-app-india",
     title: "Personal health record for Indian families",
     description:
