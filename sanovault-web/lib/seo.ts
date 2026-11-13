@@ -63,8 +63,9 @@ export type ArticleInput = {
   dateModified: string;
 };
 
-// TODO: real author or reviewer name. Until one exists in the repo, the
-// author is the SanoVault organisation; no person or clinician is named.
+export const AUTHOR_NAME = 'Vipul Swarup';
+export const AUTHOR_URL = 'https://www.linkedin.com/in/vipulswarup';
+
 export function articleJsonLd({ headline, description, path, datePublished, dateModified }: ArticleInput) {
   const url = `${CANONICAL_SITE_URL}${path}`;
   return {
@@ -78,7 +79,7 @@ export function articleJsonLd({ headline, description, path, datePublished, date
     inLanguage: 'en-IN',
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url,
-    author: { '@type': 'Organization', name: 'SanoVault', url: CANONICAL_SITE_URL },
+    author: { '@type': 'Person', name: AUTHOR_NAME, url: AUTHOR_URL, sameAs: [AUTHOR_URL] },
     publisher: {
       '@type': 'Organization',
       '@id': ARGALI_ID,

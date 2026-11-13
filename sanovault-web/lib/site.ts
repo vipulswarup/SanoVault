@@ -8,3 +8,5 @@ export const SITE_DESCRIPTION =
 export function appBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_APP_URL || CANONICAL_SITE_URL).replace(/\/$/, '');
 }
+
+export const APP_STORE_URL = 'https://apps.apple.com/us/app/sanovault/id6812724169';

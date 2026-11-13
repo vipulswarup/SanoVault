@@ -4,6 +4,7 @@ import { ARGALI_ID, ORGANIZATION_ID, faqJsonLd, type FaqItem } from "@/lib/seo";
 import {
   CANONICAL_SITE_URL,
   SITE_DESCRIPTION,
+  APP_STORE_URL,
   SITE_NAME,
   SITE_TAGLINE,
 } from "@/lib/site";
@@ -168,7 +169,9 @@ const jsonLd = {
       name: SITE_NAME,
       url: CANONICAL_SITE_URL,
       applicationCategory: "HealthApplication",
-      operatingSystem: "Web",
+      operatingSystem: "Web, iOS",
+      downloadUrl: APP_STORE_URL,
+      installUrl: APP_STORE_URL,
       description: SITE_DESCRIPTION,
       publisher: { "@id": ORGANIZATION_ID },
       offers: {
@@ -196,8 +199,8 @@ const jsonLd = {
         email: "support@eisenvault.com",
         availableLanguage: ["en"],
       },
-      // TODO: add LinkedIn, X and app-store URLs once verified official profiles exist.
-      sameAs: ["https://www.eisenvault.com/"],
+      // No official social profiles or Android listing exist yet; add to sameAs when they do.
+      sameAs: ["https://www.eisenvault.com/", APP_STORE_URL],
       parentOrganization: { "@id": ARGALI_ID },
     },
     {

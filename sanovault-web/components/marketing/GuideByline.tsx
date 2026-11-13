@@ -1,4 +1,5 @@
 import { MARKETING_ROUTES } from '@/lib/marketing-routes';
+import { AUTHOR_NAME, AUTHOR_URL } from '@/lib/seo';
 
 // TODO: publish vs modified dates are not tracked separately in the repo; the
 // sitemap lastModified value is used for both.
@@ -21,7 +22,11 @@ export function GuideByline({ path }: { path: string }) {
   const { dateModified } = guideDates(path);
   return (
     <p className="mt-3 text-sm text-blue-slate">
-      By SanoVault · Updated on <time dateTime={dateModified}>{formatDate(dateModified)}</time>
+      By{' '}
+      <a href={AUTHOR_URL} rel="author noopener" target="_blank" className="font-medium text-coral hover:underline">
+        {AUTHOR_NAME}
+      </a>{' '}
+      · Updated on <time dateTime={dateModified}>{formatDate(dateModified)}</time>
     </p>
   );
 }

@@ -8,12 +8,14 @@ SanoVault is for families who want to keep their own medical papers, including o
 
 - It is not a hospital system and does not give medical advice.
 - It is not a replacement for ABHA. It does not currently fetch records from ABHA or ABDM; you can optionally save an ABHA number on a profile for reference.
-- It is a web app. It is not certified under HIPAA, GDPR or India's DPDP Act.
+- It is available as a web app and an iOS app (https://apps.apple.com/us/app/sanovault/id6812724169). There is no Android app yet.
+- It is not certified under HIPAA, GDPR or India's DPDP Act.
 - It does not promise India-only storage (see the privacy policy).
 
 ## Key pages
 
 - [SanoVault home](https://www.sanovault.com/)
+- [SanoVault on the Apple App Store](https://apps.apple.com/us/app/sanovault/id6812724169)
 - [Personal health record app for Indian families](https://www.sanovault.com/personal-health-record-app-india)
 - [Family health records](https://www.sanovault.com/family-health-records)
 - [How to organize your medical records](https://www.sanovault.com/guides/how-to-organize-medical-records)
