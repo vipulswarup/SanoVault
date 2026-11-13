@@ -64,6 +64,10 @@ export default function PersonalHealthRecordPage() {
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             SanoVault is a personal health record app for people and families in India. It helps you keep medical documents from different doctors, hospitals and labs together, including older files that may never appear in one hospital system.
           </p>
+          <p className="mt-3 text-base leading-7 text-blue-slate">
+            Looking for a comparison of PHR options in India?{' '}
+            <Link href="/best-personal-health-record-apps-india" className="font-medium text-coral hover:underline">See the dated comparison</Link>.
+          </p>
 
           <h2 className="mt-12 text-2xl font-bold tracking-tight">What is a personal health record?</h2>
           <p className="mt-3 text-base leading-7 text-blue-slate">

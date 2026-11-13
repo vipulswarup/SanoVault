@@ -11,5 +11,6 @@ export const GUIDES: GuideLink[] = [
 
 export const PRODUCT_PAGES: GuideLink[] = [
   { href: '/personal-health-record-app-india', title: 'Personal health record app for Indian families', description: 'What a personal health record is and how it differs from a hospital record.' },
+  { href: '/best-personal-health-record-apps-india', title: 'Personal health record apps in India, compared', description: 'A dated, sourced look at ABHA, DigiLocker, Eka Care, Practo and SanoVault.' },
   { href: '/family-health-records', title: 'Family health records', description: 'Keep records for children, parents and yourself in one folder.' },
 ];
