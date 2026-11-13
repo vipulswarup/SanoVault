@@ -11,31 +11,80 @@ export type BreadcrumbItem = {
   path: string;
 };
 
+// Page-level openGraph/twitter objects replace the root ones in Next.js, so the
+// default share image is re-declared here for every public page.
+export const OG_IMAGE_URL = `${CANONICAL_SITE_URL}/opengraph-image.png`;
+const OG_IMAGE = { url: OG_IMAGE_URL, width: 1200, height: 630, alt: 'SanoVault — all your family\'s medical records in one place' };
+
+export const ORGANIZATION_ID = `${CANONICAL_SITE_URL}/#organization`;
+export const ARGALI_ID = `${CANONICAL_SITE_URL}/#argali`;
+
 export function publicPageMetadata({
   title,
   description,
   path,
+  type = 'website',
+  noindex = false,
 }: {
   title: string;
   description: string;
   path: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
 }): Metadata {
   return {
     title: { absolute: title },
     description,
     alternates: { canonical: path },
-    robots: { index: true, follow: true },
+    robots: noindex ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title,
       description,
       url: path,
-      type: 'website',
+      type,
       locale: 'en_IN',
+      siteName: 'SanoVault',
+      images: [OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [OG_IMAGE_URL],
+    },
+  };
+}
+
+export type ArticleInput = {
+  headline: string;
+  description: string;
+  path: string;
+  datePublished: string;
+  dateModified: string;
+};
+
+// TODO: real author or reviewer name. Until one exists in the repo, the
+// author is the SanoVault organisation; no person or clinician is named.
+export function articleJsonLd({ headline, description, path, datePublished, dateModified }: ArticleInput) {
+  const url = `${CANONICAL_SITE_URL}${path}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline,
+    description,
+    image: [OG_IMAGE_URL],
+    datePublished,
+    dateModified,
+    inLanguage: 'en-IN',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    url,
+    author: { '@type': 'Organization', name: 'SanoVault', url: CANONICAL_SITE_URL },
+    publisher: {
+      '@type': 'Organization',
+      '@id': ARGALI_ID,
+      name: 'Argali Knowledge Services Private Limited',
+      url: 'https://www.eisenvault.com/',
+      logo: { '@type': 'ImageObject', url: `${CANONICAL_SITE_URL}/logo.png` },
     },
   };
 }

@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/marketing/Breadcrumbs';
 import { FaqSection } from '@/components/marketing/FaqSection';
 import { JsonLd } from '@/components/marketing/JsonLd';
+import { GuideByline, guideDates } from '@/components/marketing/GuideByline';
 import { MarketingShell } from '@/components/marketing/MarketingShell';
-import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
 const TITLE = 'How to Scan Old Paper Medical Reports at Home | SanoVault';
 const DESCRIPTION =
-  'A step-by-step guide to digitising old paper medical reports with just your phone: what to scan first, how to get a readable image, how to name and back up files, and what to do with the originals.';
+  "A step-by-step guide to digitising old paper medical reports with your phone: what to scan first, how to name files, and what to do with originals.";
 const PATH = '/guides/scan-old-medical-reports';
 
 const CRUMBS: BreadcrumbItem[] = [
@@ -47,11 +48,13 @@ export const metadata: Metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
+  type: 'article',
 });
 
 export default function ScanOldReportsGuidePage() {
   return (
     <MarketingShell>
+      <JsonLd data={articleJsonLd({ headline: 'How to Scan Old Paper Medical Reports at Home', description: DESCRIPTION, path: PATH, ...guideDates(PATH) })} />
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQS)} />
 
@@ -62,6 +65,7 @@ export default function ScanOldReportsGuidePage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             How to Scan Old Paper Medical Reports at Home
           </h1>
+          <GuideByline path={PATH} />
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             Years of prescriptions, lab printouts and discharge papers are easy to lose and hard to search. You do not need a flatbed scanner to fix that. A phone, decent light and a plan are enough. This guide covers what to scan first, how to get a readable copy, and what to do with the paper afterwards.
           </p>

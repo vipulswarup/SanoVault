@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/marketing/Breadcrumbs';
 import { FaqSection } from '@/components/marketing/FaqSection';
 import { JsonLd } from '@/components/marketing/JsonLd';
+import { GuideByline, guideDates } from '@/components/marketing/GuideByline';
 import { MarketingShell } from '@/components/marketing/MarketingShell';
-import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
-const TITLE = 'ABHA vs Personal Health Record: Do You Need Both? | SanoVault';
+const TITLE = 'ABHA vs Personal Health Record: Need Both? | SanoVault';
 const DESCRIPTION =
-  'ABHA is India’s health ID; a personal health record is where you keep your own medical files. Here is what each does, how they differ, and when you might want both.';
+  "ABHA is India's health ID; a personal health record is where you keep your own medical files. Here is what each does and when you might want both.";
 const PATH = '/guides/abha-vs-personal-health-record';
 
 const CRUMBS: BreadcrumbItem[] = [
@@ -43,11 +44,13 @@ export const metadata: Metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
+  type: 'article',
 });
 
 export default function AbhaVsPhrGuidePage() {
   return (
     <MarketingShell>
+      <JsonLd data={articleJsonLd({ headline: 'ABHA vs Personal Health Record: Do You Need Both?', description: DESCRIPTION, path: PATH, ...guideDates(PATH) })} />
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQS)} />
 
@@ -58,6 +61,7 @@ export default function AbhaVsPhrGuidePage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             ABHA vs Personal Health Record: Do You Need Both?
           </h1>
+          <GuideByline path={PATH} />
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             People often treat these as the same thing. They are not. ABHA is an identifier that helps records move between healthcare providers with your consent. A personal health record is the collection of medical documents you keep yourself. This guide explains the difference and when each is useful.
           </p>

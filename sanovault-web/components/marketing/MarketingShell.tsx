@@ -11,7 +11,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             <Link href="/" className="flex shrink-0 items-center gap-2.5">
               <Image
                 src="/logo.png"
-                alt="SanoVault"
+                alt=""
                 width={40}
                 height={40}
                 className="rounded-full"

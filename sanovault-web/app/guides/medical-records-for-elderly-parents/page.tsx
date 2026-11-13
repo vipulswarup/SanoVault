@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/marketing/Breadcrumbs';
 import { FaqSection } from '@/components/marketing/FaqSection';
 import { JsonLd } from '@/components/marketing/JsonLd';
+import { GuideByline, guideDates } from '@/components/marketing/GuideByline';
 import { MarketingShell } from '@/components/marketing/MarketingShell';
-import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
 const TITLE = 'How to Keep Medical Records for Elderly Parents | SanoVault';
 const DESCRIPTION =
-  'A practical guide for adult children managing an ageing parent’s medical papers: how to get started, what to gather, how to keep a current medicine list, how to share with siblings, and how to handle consent and privacy.';
+  "A practical guide for adult children managing an ageing parent's medical papers in India: what to gather, medicine lists, siblings and consent.";
 const PATH = '/guides/medical-records-for-elderly-parents';
 
 const CRUMBS: BreadcrumbItem[] = [
@@ -43,11 +44,13 @@ export const metadata: Metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
+  type: 'article',
 });
 
 export default function ElderlyParentsRecordsGuidePage() {
   return (
     <MarketingShell>
+      <JsonLd data={articleJsonLd({ headline: 'How to Keep Medical Records for Elderly Parents', description: DESCRIPTION, path: PATH, ...guideDates(PATH) })} />
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQS)} />
 
@@ -58,6 +61,7 @@ export default function ElderlyParentsRecordsGuidePage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             How to Keep Medical Records for Elderly Parents
           </h1>
+          <GuideByline path={PATH} />
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             If you help look after an ageing parent, you are probably the one hunting for last year&apos;s report in a drawer, a WhatsApp chat, or a relative&apos;s phone. This guide is a calm, practical way to put those papers in order, so that a hospital visit or a second opinion does not start with a scramble.
           </p>

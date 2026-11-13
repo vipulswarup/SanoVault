@@ -6,7 +6,7 @@ import { MarketingShell } from '@/components/marketing/MarketingShell';
 import { breadcrumbJsonLd, publicPageMetadata, type BreadcrumbItem } from '@/lib/seo';
 import { CANONICAL_SITE_URL } from '@/lib/site';
 
-const TITLE = 'About SanoVault | Built by Argali Knowledge Services, the team behind EisenVault';
+const TITLE = 'About SanoVault — Built by the EisenVault team';
 const DESCRIPTION =
   'SanoVault is built by Argali Knowledge Services Pvt Ltd, the team behind EisenVault. Learn who makes SanoVault and how to contact us.';
 const PATH = '/about';

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BETA_ACKNOWLEDGEMENT_TEXT } from "@/lib/legal/beta-acknowledgement";
-import { faqJsonLd, type FaqItem } from "@/lib/seo";
+import { ARGALI_ID, ORGANIZATION_ID, faqJsonLd, type FaqItem } from "@/lib/seo";
 import {
   CANONICAL_SITE_URL,
   SITE_DESCRIPTION,
@@ -155,17 +155,22 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
+      "@id": `${CANONICAL_SITE_URL}/#website`,
       name: SITE_NAME,
       url: CANONICAL_SITE_URL,
       description: SITE_DESCRIPTION,
+      inLanguage: "en-IN",
+      publisher: { "@id": ORGANIZATION_ID },
     },
     {
       "@type": "SoftwareApplication",
+      "@id": `${CANONICAL_SITE_URL}/#software`,
       name: SITE_NAME,
       url: CANONICAL_SITE_URL,
       applicationCategory: "HealthApplication",
       operatingSystem: "Web",
       description: SITE_DESCRIPTION,
+      publisher: { "@id": ORGANIZATION_ID },
       offers: {
         "@type": "Offer",
         price: "0",
@@ -174,14 +179,32 @@ const jsonLd = {
     },
     {
       "@type": "Organization",
+      "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       url: CANONICAL_SITE_URL,
       logo: `${CANONICAL_SITE_URL}/logo.png`,
-      parentOrganization: {
-        "@type": "Organization",
-        name: "Argali Knowledge Services Pvt Ltd",
-        url: "https://www.eisenvault.com/",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "4th Floor, Statesman House, Barakhamba Road",
+        addressLocality: "New Delhi",
+        postalCode: "110001",
+        addressCountry: "IN",
       },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "support@eisenvault.com",
+        availableLanguage: ["en"],
+      },
+      // TODO: add LinkedIn, X and app-store URLs once verified official profiles exist.
+      sameAs: ["https://www.eisenvault.com/"],
+      parentOrganization: { "@id": ARGALI_ID },
+    },
+    {
+      "@type": "Organization",
+      "@id": ARGALI_ID,
+      name: "Argali Knowledge Services Private Limited",
+      url: "https://www.eisenvault.com/",
     },
   ],
 };

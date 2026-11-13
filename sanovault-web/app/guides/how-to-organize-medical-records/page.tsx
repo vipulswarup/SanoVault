@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/marketing/Breadcrumbs';
 import { FaqSection } from '@/components/marketing/FaqSection';
 import { JsonLd } from '@/components/marketing/JsonLd';
+import { GuideByline, guideDates } from '@/components/marketing/GuideByline';
 import { MarketingCta, MarketingShell } from '@/components/marketing/MarketingShell';
-import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
-const TITLE = 'How to Organize Your Medical Records: A Practical Guide | SanoVault';
+const TITLE = 'How to Organize Your Medical Records | SanoVault';
 const DESCRIPTION =
-  'A practical guide to organising medical records in India — which papers to keep, how to digitise old reports, name files, back them up, and prepare a concise set before a doctor visit.';
+  "A practical guide to organising medical records in India: which papers to keep, how to digitise old reports, name files, and prepare for a doctor visit.";
 const PATH = '/guides/how-to-organize-medical-records';
 
 const CRUMBS: BreadcrumbItem[] = [
@@ -43,11 +44,13 @@ export const metadata: Metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
+  type: 'article',
 });
 
 export default function OrganizeMedicalRecordsGuidePage() {
   return (
     <MarketingShell>
+      <JsonLd data={articleJsonLd({ headline: 'How to Organize Your Medical Records', description: DESCRIPTION, path: PATH, ...guideDates(PATH) })} />
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQS)} />
 
@@ -58,6 +61,7 @@ export default function OrganizeMedicalRecordsGuidePage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             How to Organize Your Medical Records
           </h1>
+          <GuideByline path={PATH} />
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             This is a practical way to keep medical records you can actually find — on paper, on a computer, or in an app. You do not need special software to follow it. The aim is a dated, named set of documents for each person, not a perfect archive of every slip.
           </p>

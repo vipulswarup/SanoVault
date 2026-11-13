@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/marketing/Breadcrumbs';
 import { FaqSection } from '@/components/marketing/FaqSection';
 import { JsonLd } from '@/components/marketing/JsonLd';
+import { GuideByline, guideDates } from '@/components/marketing/GuideByline';
 import { MarketingShell } from '@/components/marketing/MarketingShell';
-import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
-const TITLE = 'Is It Safe to Store Medical Records Online? A Practical Checklist | SanoVault';
+const TITLE = 'Is It Safe to Store Medical Records Online? | SanoVault';
 const DESCRIPTION =
-  'Storing medical records online is convenient, but not risk-free. Here is where the real risks are (WhatsApp, email, shared links), what to ask any app or service, and how to protect your family’s files.';
+  "Storing medical records online is convenient but not risk-free. Here is where the risks are, what to ask any app, and how to protect family files.";
 const PATH = '/guides/is-it-safe-to-store-medical-records-online';
 
 const CRUMBS: BreadcrumbItem[] = [
@@ -47,11 +48,13 @@ export const metadata: Metadata = publicPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
+  type: 'article',
 });
 
 export default function SafeOnlineRecordsGuidePage() {
   return (
     <MarketingShell>
+      <JsonLd data={articleJsonLd({ headline: 'Is It Safe to Store Medical Records Online?', description: DESCRIPTION, path: PATH, ...guideDates(PATH) })} />
       <JsonLd data={breadcrumbJsonLd(CRUMBS)} />
       <JsonLd data={faqJsonLd(FAQS)} />
 
@@ -62,6 +65,7 @@ export default function SafeOnlineRecordsGuidePage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             Is It Safe to Store Medical Records Online?
           </h1>
+          <GuideByline path={PATH} />
           <p className="mt-4 text-lg leading-7 text-blue-slate">
             The honest answer is: it can be, but it depends on where you store them and how you handle your own account. Paper gets lost and burnt. Online storage can be exposed. Neither is automatically safer. This guide shows where the real risks are and gives you a checklist for judging any app or service, including ours.
           </p>

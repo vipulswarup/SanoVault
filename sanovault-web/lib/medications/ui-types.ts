@@ -128,11 +128,28 @@ export function formValuesFromMedication(medication: Medication): MedicationForm
   };
 }
 
-export function buildCompositionPayload(values: MedicationFormValues) {
+export function buildCompositionPayload(
+  values: MedicationFormValues,
+  options?: { confirmEntered?: boolean },
+) {
   const manualIngredients = values.ingredients.filter(
     (ingredient) => ingredient.canonicalInn.trim() && ingredient.strength.trim() && ingredient.strengthUnit.trim(),
   );
-  return values.selectedProduct
-    ? { status: 'CONFIRMED' as const, catalogProductId: values.selectedProduct.id }
-    : { status: 'UNCONFIRMED' as const, formulation: values.formulation, ingredients: manualIngredients };
+  if (values.selectedProduct) {
+    return { status: 'CONFIRMED' as const, catalogProductId: values.selectedProduct.id };
+  }
+  if (options?.confirmEntered && manualIngredients.length > 0) {
+    return {
+      status: 'CONFIRMED' as const,
+      formulation: values.formulation,
+      ingredients: manualIngredients,
+    };
+  }
+  return { status: 'UNCONFIRMED' as const, formulation: values.formulation, ingredients: manualIngredients };
+}
+
+export function compositionIngredientsComplete(medication: Medication) {
+  return medication.composition.ingredients.some(
+    (ingredient) => ingredient.canonicalInn.trim() && ingredient.strength.trim() && ingredient.strengthUnit.trim(),
+  );
 }

@@ -8,7 +8,7 @@ import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, t
 
 const TITLE = 'Personal Health Record App for Indian Families | SanoVault';
 const DESCRIPTION =
-  'A personal health record is a health history you keep yourself. SanoVault helps Indian families organise lab reports, prescriptions, scans and medicines from different hospitals — including records that are not in one hospital system.';
+  'SanoVault is a personal health record app for Indian families. Organise lab reports, prescriptions and medicines from any hospital, including older papers.';
 const PATH = '/personal-health-record-app-india';
 
 const CRUMBS: BreadcrumbItem[] = [

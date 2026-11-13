@@ -6,9 +6,9 @@ import { JsonLd } from '@/components/marketing/JsonLd';
 import { MarketingCta, MarketingShell } from '@/components/marketing/MarketingShell';
 import { breadcrumbJsonLd, faqJsonLd, publicPageMetadata, type BreadcrumbItem, type FaqItem } from '@/lib/seo';
 
-const TITLE = "Family Health Records App | Keep Your Family's Medical History Together";
+const TITLE = 'Family Health Records for Indian Households | SanoVault';
 const DESCRIPTION =
-  "Keep medical records for yourself, your children, and ageing parents in one family folder. Organise reports, medicines and history from different doctors, with access only for people you invite.";
+  "Keep medical records for yourself, your children and ageing parents in one SanoVault family folder, with access only for people you invite.";
 const PATH = '/family-health-records';
 
 const CRUMBS: BreadcrumbItem[] = [

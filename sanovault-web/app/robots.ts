@@ -29,6 +29,5 @@ export default function robots(): MetadataRoute.Robots {
       ],
     },
     sitemap: `${CANONICAL_SITE_URL}/sitemap.xml`,
-    host: CANONICAL_SITE_URL,
   };
 }

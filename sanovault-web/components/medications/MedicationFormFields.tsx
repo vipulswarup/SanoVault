@@ -11,6 +11,7 @@ type Props = {
   onChange: (values: MedicationFormValues) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onCancel?: () => void;
+  onConfirmEntered?: () => void;
   showPhotoCapture?: boolean;
   photoCapture?: React.ReactNode;
   extractionHint?: string | null;
@@ -24,6 +25,7 @@ export function MedicationFormFields({
   onChange,
   onSubmit,
   onCancel,
+  onConfirmEntered,
   photoCapture,
   extractionHint,
 }: Props) {
@@ -161,13 +163,27 @@ export function MedicationFormFields({
               </div>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={() => onChange({ ...values, ingredients: [...values.ingredients, emptyIngredient()] })}
-            className="mt-3 text-sm font-medium text-coral hover:underline"
-          >
-            + Add ingredient
-          </button>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onChange({ ...values, ingredients: [...values.ingredients, emptyIngredient()] })}
+              className="text-sm font-medium text-coral hover:underline"
+            >
+              + Add ingredient
+            </button>
+            {onConfirmEntered && values.ingredients.some(
+              (ingredient) => ingredient.canonicalInn.trim() && ingredient.strength.trim() && ingredient.strengthUnit.trim(),
+            ) ? (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={onConfirmEntered}
+                className="rounded-lg bg-coral px-3 py-1.5 text-sm font-medium text-white hover:bg-coral-strong disabled:opacity-60"
+              >
+                Confirm this composition
+              </button>
+            ) : null}
+          </div>
         </div>
       )}
 
