@@ -12,6 +12,7 @@ export const MARKETING_ROUTES: MarketingRoute[] = [
   { path: '/', lastModified: '2026-09-19', changeFrequency: 'weekly', priority: 1 },
   { path: '/personal-health-record-app-india', lastModified: '2026-09-19', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/family-health-records', lastModified: '2026-09-19', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/guides', lastModified: '2026-11-13', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/guides/how-to-organize-medical-records', lastModified: '2026-09-19', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/guides/abha-vs-personal-health-record', lastModified: '2026-11-11', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/guides/scan-old-medical-reports', lastModified: '2026-11-11', changeFrequency: 'monthly', priority: 0.8 },

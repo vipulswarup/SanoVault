@@ -16,6 +16,7 @@ SanoVault is for families who want to keep their own medical papers, including o
 
 - [SanoVault home](https://www.sanovault.com/)
 - [SanoVault on the Apple App Store](https://apps.apple.com/us/app/sanovault/id6812724169)
+- [All guides](https://www.sanovault.com/guides)
 - [Personal health record app for Indian families](https://www.sanovault.com/personal-health-record-app-india)
 - [Family health records](https://www.sanovault.com/family-health-records)
 - [How to organize your medical records](https://www.sanovault.com/guides/how-to-organize-medical-records)

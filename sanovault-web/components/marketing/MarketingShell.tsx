@@ -38,10 +38,10 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
                 Family records
               </Link>
               <Link
-                href="/guides/how-to-organize-medical-records"
+                href="/guides"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-slate hover:bg-white hover:text-ink"
               >
-                Organise records
+                Guides
               </Link>
               <Link
                 href="/guides/abha-vs-personal-health-record"
@@ -91,6 +91,9 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link href="/family-health-records" className="hover:text-ink">
               Family health records
+            </Link>
+            <Link href="/guides" className="hover:text-ink">
+              All guides
             </Link>
             <Link
               href="/guides/how-to-organize-medical-records"

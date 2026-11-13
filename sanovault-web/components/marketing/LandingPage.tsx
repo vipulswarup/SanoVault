@@ -544,7 +544,11 @@ export function LandingPage() {
             </h2>
             <p className="mt-3 max-w-2xl text-base leading-7 text-blue-slate">
               Plain-language help for keeping your family&apos;s medical
-              records in order.
+              records in order.{" "}
+              <Link href="/guides" className="font-medium text-coral hover:underline">
+                See all guides
+              </Link>
+              .
             </p>
             <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {GUIDE_LINKS.map((item) => (
