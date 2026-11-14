@@ -45,9 +45,11 @@ List<HealthRecord> sortByDocumentDate(List<HealthRecord> records) {
 }
 
 class ReportsPage extends StatefulWidget {
-  const ReportsPage({super.key, this.patientId, this.tag});
+  const ReportsPage({super.key, this.patientId, this.tag, this.onNeedsReviewCountChanged, this.needsReviewCount = 0});
   final String? patientId;
   final String? tag;
+  final VoidCallback? onNeedsReviewCountChanged;
+  final int needsReviewCount;
 
   @override
   State<ReportsPage> createState() => _ReportsPageState();
@@ -141,6 +143,7 @@ class _ReportsPageState extends State<ReportsPage>
         _loadedOnce = true;
         _refreshing = false;
       });
+      widget.onNeedsReviewCountChanged?.call();
     } catch (caught) {
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
@@ -157,6 +160,22 @@ class _ReportsPageState extends State<ReportsPage>
       ),
     );
     if (mounted) _load();
+  }
+
+  Future<void> _confirmFiling(HealthRecord record) async {
+    try {
+      await SessionScope.of(context).api
+          .updateHealthRecord(record.id, {'approveReview': true});
+      if (!mounted) return;
+      setState(() {
+        _records = _records
+            .where((item) => item.id != record.id)
+            .toList(growable: false);
+      });
+      widget.onNeedsReviewCountChanged?.call();
+    } catch (caught) {
+      if (mounted) setState(() => _error = _message(caught));
+    }
   }
 
   String _dateLabel(HealthRecord record) {
@@ -216,12 +235,25 @@ class _ReportsPageState extends State<ReportsPage>
           ),
           subtitle: Text(record.source),
           additionalInfo: Text(_dateLabel(record)),
-          trailing: const CupertinoListTileChevron(),
-          onTap: () => Navigator.of(context).push(
-            CupertinoPageRoute<void>(
-              builder: (_) => RecordDetailPage(recordId: record.id),
-            ),
-          ),
+          trailing: record.tags.contains('needs_review')
+              ? CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(44, 44),
+                  onPressed: () => _confirmFiling(record),
+                  child: const Text(
+                    'Confirm',
+                    style: TextStyle(color: SvColors.brandStrong, fontSize: 14),
+                  ),
+                )
+              : const CupertinoListTileChevron(),
+          onTap: () async {
+            await Navigator.of(context).push(
+              CupertinoPageRoute<void>(
+                builder: (_) => RecordDetailPage(recordId: record.id),
+              ),
+            );
+            if (mounted) await _load();
+          },
         ),
       );
     }
@@ -256,6 +288,17 @@ class _ReportsPageState extends State<ReportsPage>
               _load();
             },
           ),
+          if (widget.needsReviewCount > 0)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '${widget.needsReviewCount} awaiting review across your family · reports below are filtered by person',
+                  style: const TextStyle(color: SvColors.slate, fontSize: 13),
+                ),
+              ),
+            ),
           if (_tag != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),

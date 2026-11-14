@@ -60,6 +60,8 @@ function HealthRecordsContent() {
     ['source', 'recordType', 'tag', 'startDate', 'endDate'].some((key) => searchParams.has(key)),
   );
   const [recordPendingDelete, setRecordPendingDelete] = useState<string | null>(null);
+  const [approvingRecordId, setApprovingRecordId] = useState<string | null>(null);
+  const [needsReviewCount, setNeedsReviewCount] = useState(0);
 
   // Keep filter state aligned with URL (Needs review / deep links update searchParams only).
   useEffect(() => {
@@ -201,6 +203,18 @@ function HealthRecordsContent() {
     void fetchRecords();
   }, [fetchRecords]);
 
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    let cancelled = false;
+    void fetch('/api/health-records?tag=needs_review', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : [])
+      .then((data: unknown) => {
+        if (!cancelled && Array.isArray(data)) setNeedsReviewCount(data.length);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [session?.user?.id, records]);
+
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/health-records/${id}`, {
@@ -217,6 +231,31 @@ function HealthRecordsContent() {
       notify(err instanceof Error ? err.message : 'Failed to delete health record', 'error');
     } finally {
       setRecordPendingDelete(null);
+    }
+  };
+
+  const handleApproveReview = async (record: HealthRecord) => {
+    setApprovingRecordId(record.id);
+    try {
+      const response = await fetch(`/api/health-records/${record.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approveReview: true }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error || 'Could not confirm this report');
+      }
+      const updatedRecord = await response.json() as HealthRecord;
+      setRecords((current) => filterTag === 'needs_review'
+        ? current.filter((item) => item.id !== record.id)
+        : current.map((item) => item.id === record.id ? updatedRecord : item));
+      window.dispatchEvent(new Event('sanovault:needs-review-changed'));
+      notify('Report confirmed.', 'success');
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Could not confirm this report', 'error');
+    } finally {
+      setApprovingRecordId(null);
     }
   };
 
@@ -289,7 +328,7 @@ function HealthRecordsContent() {
                 onClick={() => handleTagClick('needs_review')}
                 className={`inline-flex min-h-12 items-center text-base font-medium ${filterTag === 'needs_review' ? 'text-ink underline' : 'text-coral hover:underline'}`}
               >
-                Needs review
+                Needs review{needsReviewCount > 0 ? ` (${needsReviewCount} across family)` : ''}
               </button>
               <Link
                 href={selectedPatientId ? `/reports/blood-summary?patientId=${selectedPatientId}` : '/reports/blood-summary'}
@@ -326,6 +365,11 @@ function HealthRecordsContent() {
           ) : (
             <>
               <div className="mb-6 rounded-xl border border-silver bg-white p-6 shadow-sm">
+                {needsReviewCount > 0 && (
+                  <p className="mb-4 text-sm text-slate" role="status">
+                    The review count covers everyone in this family folder. Reports below are filtered by the selected person.
+                  </p>
+                )}
                 <div className="grid gap-4 md:grid-cols-[16rem_minmax(0,1fr)_auto] md:items-end">
                   <div>
                     <label htmlFor="patient" className="mb-2 block text-sm font-medium text-blue-slate">
@@ -665,6 +709,16 @@ function HealthRecordsContent() {
                           )}
                         </div>
                         <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                          {record.tags.includes('needs_review') && (
+                            <button
+                              type="button"
+                              onClick={() => void handleApproveReview(record)}
+                              disabled={approvingRecordId === record.id}
+                              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-tint px-3 text-sm font-medium text-brand-strong hover:bg-blue-100 disabled:cursor-wait disabled:opacity-60"
+                            >
+                              {approvingRecordId === record.id ? 'Confirming…' : 'Confirm'}
+                            </button>
+                          )}
                           <Link
                             href={`/health-records/${record.id}`}
                             className="inline-flex min-h-10 items-center justify-center rounded-lg bg-blue-50 px-3 text-sm font-medium text-coral hover:bg-blue-100"

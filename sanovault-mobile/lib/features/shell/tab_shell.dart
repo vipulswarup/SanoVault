@@ -4,6 +4,7 @@ import 'package:sanovault/features/home/home_page.dart';
 import 'package:sanovault/features/medicines/medicines_page.dart';
 import 'package:sanovault/features/more/more_page.dart';
 import 'package:sanovault/features/reports/reports_page.dart';
+import 'package:sanovault/session/session_scope.dart';
 import 'package:sanovault/theme/sv_colors.dart';
 
 class TabShell extends StatefulWidget {
@@ -17,6 +18,29 @@ class _TabShellState extends State<TabShell> {
   late final CupertinoTabController _tabs = CupertinoTabController(
     initialIndex: 0,
   );
+  int _needsReviewCount = 0;
+  int _countGeneration = 0;
+
+  Future<void> _refreshNeedsReviewCount() async {
+    final generation = ++_countGeneration;
+    try {
+      final records = await SessionScope.of(context).api.healthRecords(
+        tag: 'needs_review',
+      );
+      if (!mounted || generation != _countGeneration) return;
+      setState(() => _needsReviewCount = records.length);
+    } catch (_) {
+      // Keep the last known count when the network is unavailable.
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _refreshNeedsReviewCount();
+    });
+  }
 
   @override
   void dispose() {
@@ -33,13 +57,15 @@ class _TabShellState extends State<TabShell> {
         backgroundColor: SvColors.surface,
         activeColor: SvColors.brandStrong,
         inactiveColor: SvColors.slate,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.doc_text),
+            icon: _needsReviewCount == 0
+                ? const Icon(CupertinoIcons.doc_text)
+                : _ReviewBadge(count: _needsReviewCount),
             label: 'Reports',
           ),
           BottomNavigationBarItem(
@@ -63,7 +89,10 @@ class _TabShellState extends State<TabShell> {
               case 0:
                 return const HomePage();
               case 1:
-                return const ReportsPage();
+                return ReportsPage(
+                  onNeedsReviewCountChanged: _refreshNeedsReviewCount,
+                  needsReviewCount: _needsReviewCount,
+                );
               case 2:
                 return const LogPage();
               case 3:
@@ -76,4 +105,38 @@ class _TabShellState extends State<TabShell> {
       },
     );
   }
+}
+
+class _ReviewBadge extends StatelessWidget {
+  const _ReviewBadge({required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Icon(CupertinoIcons.doc_text),
+          Positioned(
+            right: -10,
+            top: -6,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: SvColors.peach,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                count > 99 ? '99+' : '$count',
+                style: const TextStyle(
+                  color: SvColors.ink,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
 }
